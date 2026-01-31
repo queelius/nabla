@@ -42,8 +42,20 @@ correctly through sum (additive) and prod (multiplicative)."><!-- mathjax --><sc
     <li>
       <a href="../articles/mle-workflow.html">MLE Workflow with dualr</a>
     </li>
+    <li>
+      <a href="../articles/optimizer-integration.html">Optimizer Integration</a>
+    </li>
   </ul></li>
-      </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
+      </ul><ul class="nav navbar-nav navbar-right"><li>
+  <a href="https://github.com/queelius/dualr/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
+  </a>
+</li>
+      </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
@@ -53,7 +65,7 @@ correctly through sum (additive) and prod (multiplicative)."><!-- mathjax --><sc
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Summary group generic for dual numbers</h1>
-
+    <small class="dont-index">Source: <a href="https://github.com/queelius/dualr/blob/HEAD/R/dual-arithmetic.R" class="external-link"><code>R/dual-arithmetic.R</code></a></small>
     <div class="hidden name"><code>dual-summary.Rd</code></div>
     </div>
 
@@ -65,7 +77,7 @@ correctly through <code>sum</code> (additive) and <code>prod</code> (multiplicat
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'dual'</span></span>
-<span><span class="fu">Summary</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, na.rm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/methods/S4groupGeneric.html" class="external-link">Summary</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, na.rm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -90,6 +102,17 @@ correctly through <code>sum</code> (additive) and <code>prod</code> (multiplicat
 logical for any/all.</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="dual_variable.html">dual_variable</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="dual_variable.html">dual_variable</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="value.html">value</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span>   <span class="co"># 7</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7</span>
+<span class="r-in"><span><span class="fu"><a href="value.html">value</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/prod.html" class="external-link">prod</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span>  <span class="co"># 10</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
@@ -98,7 +121,7 @@ logical for any/all.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by spinoza.</p>
+  <p></p><p>Developed by Alexander Towell.</p>
 </div>
 
 <div class="pkgdown">

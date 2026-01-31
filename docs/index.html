@@ -58,10 +58,23 @@
     <li>
       <a href="articles/mle-workflow.html">MLE Workflow with dualr</a>
     </li>
+    <li>
+      <a href="articles/optimizer-integration.html">Optimizer Integration</a>
+    </li>
   </ul>
 </li>
+<li>
+  <a href="news/index.html">Changelog</a>
+</li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/queelius/dualr/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -73,11 +86,163 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-Implements forward-mode automatic differentiation using dual numbers with S4 classes. Supports first- and second-order derivatives through nested duals, with convenience functions for maximum likelihood estimation workflows including score vectors, Hessian matrices, and observed information.
+<div class="section level1">
+<div class="page-header"><h1 id="dualr-">dualr <img src="reference/figures/logo.png" align="right" height="139" alt=""><a class="anchor" aria-label="anchor" href="#dualr-"></a>
+</h1></div>
+<blockquote>
+<p>Forward-Mode Automatic Differentiation via Dual Numbers</p>
+</blockquote>
+<!-- badges: start -->
+
+<div class="section level2">
+<h2 id="why-automatic-differentiation">Why automatic differentiation?<a class="anchor" aria-label="anchor" href="#why-automatic-differentiation"></a>
+</h2>
+<p>Computing derivatives is fundamental to optimization, statistics, and scientific computing. The three main approaches are:</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th></th>
+<th><strong>Finite Differences</strong></th>
+<th><strong>Symbolic Diff</strong></th>
+<th><strong>AD (dualr)</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Accuracy</strong></td>
+<td>O(h) or O(h²) truncation error</td>
+<td>Exact</td>
+<td>Exact (machine precision)</td>
+</tr>
+<tr class="even">
+<td><strong>Cost</strong></td>
+<td>2p function evaluations</td>
+<td>Expression swell for complex f</td>
+<td>p forward passes</td>
+</tr>
+<tr class="odd">
+<td><strong>Control flow</strong></td>
+<td>Works</td>
+<td>Breaks on if/for/while</td>
+<td>Works through any code</td>
+</tr>
+<tr class="even">
+<td><strong>Implementation</strong></td>
+<td>Easy</td>
+<td>Requires CAS</td>
+<td>Operator overloading</td>
+</tr>
+</tbody>
+</table>
+<p>Finite differences are inaccurate for ill-conditioned problems. Symbolic differentiation suffers from expression swell and cannot handle control flow. <strong>Automatic differentiation</strong> gives exact derivatives at machine precision through any R code — loops, branches, and all.</p>
+</div>
+<div class="section level2">
+<h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
+</h2>
+<p>A dual number extends the reals with an infinitesimal ε where ε² = 0:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>+</mo><mi>ε</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>ε</mi></mrow><annotation encoding="application/x-tex">f(x + \varepsilon) = f(x) + f'(x)\,\varepsilon</annotation></semantics></math></p>
+<p>By propagating ε through every arithmetic operation and math function, <code>dualr</code> computes f(x) and f’(x) simultaneously in a single forward pass. No symbolic manipulation, no finite step sizes — just exact derivatives via the algebra of dual numbers.</p>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Install from CRAN</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"dualr"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Or install development version from GitHub</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"queelius/dualr"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<p><strong>Single variable derivative:</strong></p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/queelius/dualr" class="external-link">dualr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create a dual variable at x = 2 (seeds derivative tracking)</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dual_variable.html">dual_variable</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Evaluate any expression — derivatives propagate automatically</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">^</span><span class="fl">3</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/value.html">value</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>   <span class="co"># f(2) = 8.909</span></span>
+<span><span class="fu"><a href="reference/deriv.html">deriv</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>   <span class="co"># f'(2) = 3*4 + cos(2) = 11.584</span></span></code></pre></div>
+<p><strong>Multi-parameter score and Hessian (for MLE):</strong></p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Poisson log-likelihood using sufficient statistics</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">100</span>, lambda <span class="op">=</span> <span class="fl">3.5</span><span class="op">)</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="va">sum_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ll</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">lambda</span> <span class="op">&lt;-</span> <span class="va">theta</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span>  <span class="va">sum_x</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span> <span class="op">-</span> <span class="va">n</span> <span class="op">*</span> <span class="va">lambda</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Gradient (score vector) — one call, exact result</span></span>
+<span><span class="fu"><a href="reference/score.html">score</a></span><span class="op">(</span><span class="va">ll</span>, <span class="fl">3.0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Hessian matrix — exact second derivatives via nested duals</span></span>
+<span><span class="fu"><a href="reference/hessian.html">hessian</a></span><span class="op">(</span><span class="va">ll</span>, <span class="fl">3.0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Observed information = -Hessian</span></span>
+<span><span class="fu"><a href="reference/observed_information.html">observed_information</a></span><span class="op">(</span><span class="va">ll</span>, <span class="fl">3.0</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="use-cases">Use cases<a class="anchor" aria-label="anchor" href="#use-cases"></a>
+</h2>
+<ul>
+<li>
+<strong>Optimization</strong> — supply exact gradients to <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> and <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code>
+</li>
+<li>
+<strong>Maximum likelihood estimation</strong> — score vectors, Hessians, and standard errors</li>
+<li>
+<strong>Sensitivity analysis</strong> — how outputs change with respect to inputs</li>
+<li>
+<strong>Taylor approximation</strong> — compute polynomial approximations with exact coefficients</li>
+<li>
+<strong>Curvature analysis</strong> — second-order geometric properties of curves</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="vignettes">Vignettes<a class="anchor" aria-label="anchor" href="#vignettes"></a>
+</h2>
+<!-- Links work on the pkgdown site; use browseVignettes("dualr") locally -->
+<ul>
+<li>
+<a href="articles/introduction.html">Introduction to dualr</a> — dual numbers, arithmetic, composition, comparison with finite differences</li>
+<li>
+<a href="articles/mle-workflow.html">MLE Workflow</a> — score, Hessian, observed information, Newton-Raphson on statistical models</li>
+<li>
+<a href="articles/higher-order.html">Higher-Order Derivatives</a> — nested duals, curvature, Taylor expansion</li>
+<li>
+<a href="articles/optimizer-integration.html">Optimizer Integration</a> — using <code><a href="reference/score.html">score()</a></code> and <code><a href="reference/hessian.html">hessian()</a></code> with <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> and <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code>
+</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>MIT</p>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <div class="license">
+    <div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/queelius/dualr/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/queelius/dualr/issues" class="external-link">Report a bug</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>
@@ -97,11 +262,17 @@ Implements forward-mode automatic differentiation using dual numbers with S4 cla
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>spinoza <br><small class="roles"> Author, maintainer </small>   </li>
+<li>Alexander Towell <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-6443-9897" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://CRAN.R-project.org/package=dualr" class="external-link"><img src="https://www.r-pkg.org/badges/version/dualr" alt="CRAN status"></a></li>
+<li><a href="https://github.com/queelius/dualr/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/queelius/dualr/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </div>
 </div>
@@ -109,7 +280,7 @@ Implements forward-mode automatic differentiation using dual numbers with S4 cla
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by spinoza.</p>
+<p>Developed by Alexander Towell.</p>
 </div>
 
 <div class="pkgdown">

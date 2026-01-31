@@ -41,8 +41,20 @@ The derivative of \(\psi^{(n)}(x)\) is \(\psi^{(n+1)}(x)\)."><!-- mathjax --><sc
     <li>
       <a href="../articles/mle-workflow.html">MLE Workflow with dualr</a>
     </li>
+    <li>
+      <a href="../articles/optimizer-integration.html">Optimizer Integration</a>
+    </li>
   </ul></li>
-      </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
+      </ul><ul class="nav navbar-nav navbar-right"><li>
+  <a href="https://github.com/queelius/dualr/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
+  </a>
+</li>
+      </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
@@ -52,7 +64,7 @@ The derivative of \(\psi^{(n)}(x)\) is \(\psi^{(n+1)}(x)\)."><!-- mathjax --><sc
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Polygamma function for dual numbers</h1>
-
+    <small class="dont-index">Source: <a href="https://github.com/queelius/dualr/blob/HEAD/R/dual-special.R" class="external-link"><code>R/dual-special.R</code></a></small>
     <div class="hidden name"><code>psigamma.Rd</code></div>
     </div>
 
@@ -88,6 +100,15 @@ The derivative of \(\psi^{(n)}(x)\) is \(\psi^{(n+1)}(x)\).</p>
     <p>The polygamma function value.</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">psigamma</span><span class="op">(</span><span class="fl">1</span>, deriv <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>  <span class="co"># digamma(1)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.5772157</span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="dual_variable.html">dual_variable</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="value.html">value</a></span><span class="op">(</span><span class="fu">psigamma</span><span class="op">(</span><span class="va">x</span>, deriv <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>  <span class="co"># trigamma(2)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.6449341</span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
@@ -96,7 +117,7 @@ The derivative of \(\psi^{(n)}(x)\) is \(\psi^{(n+1)}(x)\).</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by spinoza.</p>
+  <p></p><p>Developed by Alexander Towell.</p>
 </div>
 
 <div class="pkgdown">

@@ -109,6 +109,12 @@ data.frame(
 )
 ```
 
+All three methods agree to machine precision for this simple quadratic
+log-likelihood. The score is linear in $\mu$ and the Hessian is constant
+($-n/\sigma^2 = -25$), so there are no higher-order terms for finite
+differences to approximate poorly. This model serves as a sanity check
+that the AD machinery is wired correctly.
+
 The `observed_information()` function returns the negative Hessian:
 
 ```{r}
@@ -176,6 +182,13 @@ analytical_hess2
 cat("\nMax absolute difference:", max(abs(ad_hess2 - analytical_hess2)), "\n")
 ```
 
+The maximum absolute difference between the AD and analytical Hessians is
+at the level of machine epsilon ($\sim 10^{-14}$), confirming that AD
+computes exact second derivatives even for this two-parameter model. The
+cross-derivative $\partial^2 \ell / \partial\mu\,\partial\sigma$ is non-zero
+when $\mu \ne \bar{x}$, exercising the mixed-partial logic in nested dual
+arithmetic.
+
 ## Poisson distribution: unknown lambda
 
 Given count data $x_1, \ldots, x_n$ from Poisson($\lambda$):
@@ -215,6 +228,11 @@ data.frame(
   AD = c(ad_score_p, ad_hess_p)
 )
 ```
+
+Again, all three methods agree exactly. The Poisson log-likelihood involves
+only `log(lambda)` and linear terms in $\lambda$, so the sufficient
+statistics produce clean rational expressions for the score and Hessian —
+making this an ideal test case for verifying AD correctness.
 
 ### Visualizing the score function
 
@@ -298,6 +316,15 @@ data.frame(
 )
 ```
 
+The Gamma model is a key differentiator between AD and finite differences.
+The log-likelihood involves `lgamma(alpha)`, whose derivatives are
+`digamma` and `trigamma` — special functions that `dualr` propagates
+exactly through the chain rule. With finite differences, choosing a good
+step size $h$ for `lgamma` is tricky: too large introduces truncation
+error in the rapidly-varying digamma function, too small amplifies
+round-off. AD sidesteps this entirely by computing the exact `digamma`
+and `trigamma` values at each evaluation point.
+
 ## Logistic regression: 2 predictors
 
 For a binary response $y_i \in \{0, 1\}$ with design matrix $X$ and
@@ -349,6 +376,13 @@ data.frame(
 # Hessian comparison
 cat("Max |AD - numerical| in Hessian:", max(abs(ad_hess_lr - num_hess_lr)), "\n")
 ```
+
+The numerical Hessian difference ($\sim 10^{-5}$) is noticeably larger than
+in the earlier models. This is because the logistic log-likelihood is
+computed via a loop over $n = 50$ observations, and each finite-difference
+perturbation accumulates small errors across all iterations. AD remains
+exact regardless of the number of loop iterations — each arithmetic
+operation propagates derivatives without approximation.
 
 ## Newton-Raphson optimizer
 
@@ -481,3 +515,22 @@ cat("\nMax absolute difference:", max(abs(result_sh$hessian - hess_from_ll)), "\
 The two approaches should agree to machine precision, since both use exact
 AD — one differentiates the log-likelihood twice, the other differentiates
 the score once.
+
+## Summary
+
+Across five models of increasing complexity, several patterns emerge:
+
+- **AD matches analytical derivatives to machine precision.** Whether the
+  log-likelihood involves simple polynomials (Normal), special functions
+  (`lgamma` in Gamma), or loops over observations (logistic regression),
+  `score()` and `hessian()` return exact results.
+- **Finite differences introduce step-size-dependent error.** For simple
+  models the error is negligible ($\sim 10^{-10}$), but for loop-based
+  likelihoods it grows to $\sim 10^{-5}$ — large enough to affect
+  optimization convergence and standard error estimates.
+- **`score_and_hessian()` is useful when the score has been simplified by
+  hand.** It avoids differentiating the full log-likelihood twice, instead
+  differentiating the (simpler) score function once to obtain the Hessian.
+- **Newton-Raphson with AD gradients converges in few iterations.** The
+  exact Hessian provides the quadratic convergence that Newton's method
+  promises in theory — no line search or quasi-Newton approximation needed.

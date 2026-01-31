@@ -49,8 +49,20 @@ cumsum, factorial, lfactorial."><!-- mathjax --><script src="https://cdnjs.cloud
     <li>
       <a href="../articles/mle-workflow.html">MLE Workflow with dualr</a>
     </li>
+    <li>
+      <a href="../articles/optimizer-integration.html">Optimizer Integration</a>
+    </li>
   </ul></li>
-      </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
+      </ul><ul class="nav navbar-nav navbar-right"><li>
+  <a href="https://github.com/queelius/dualr/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
+  </a>
+</li>
+      </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
@@ -60,7 +72,7 @@ cumsum, factorial, lfactorial."><!-- mathjax --><script src="https://cdnjs.cloud
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Math group generic for dual numbers</h1>
-
+    <small class="dont-index">Source: <a href="https://github.com/queelius/dualr/blob/HEAD/R/dual-math.R" class="external-link"><code>R/dual-math.R</code></a></small>
     <div class="hidden name"><code>dual-math.Rd</code></div>
     </div>
 
@@ -79,7 +91,7 @@ the chain rule: <code>f(dual(a, b)) = dual(f(a), df(a) * b)</code>.</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'dual'</span></span>
-<span><span class="fu">Math</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/methods/S4groupGeneric.html" class="external-link">Math</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -96,6 +108,24 @@ the chain rule: <code>f(dual(a, b)) = dual(f(a), df(a) * b)</code>.</p>
 derivative propagated via the chain rule.</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="dual_variable.html">dual_variable</a></span><span class="op">(</span><span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="value.html">value</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>  <span class="co"># sin(pi/4)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.7071068</span>
+<span class="r-in"><span><span class="fu"><a href="deriv.html">deriv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>  <span class="co"># cos(pi/4)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.7071068</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="dual_variable.html">dual_variable</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="value.html">value</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span>  <span class="co"># exp(2)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7.389056</span>
+<span class="r-in"><span><span class="fu"><a href="deriv.html">deriv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span>  <span class="co"># exp(2)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7.389056</span>
+<span class="r-in"><span><span class="fu"><a href="deriv.html">deriv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span>  <span class="co"># 1/2</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
@@ -104,7 +134,7 @@ derivative propagated via the chain rule.</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by spinoza.</p>
+  <p></p><p>Developed by Alexander Towell.</p>
 </div>
 
 <div class="pkgdown">

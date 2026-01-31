@@ -40,8 +40,20 @@
     <li>
       <a href="../articles/mle-workflow.html">MLE Workflow with dualr</a>
     </li>
+    <li>
+      <a href="../articles/optimizer-integration.html">Optimizer Integration</a>
+    </li>
   </ul></li>
-      </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
+      </ul><ul class="nav navbar-nav navbar-right"><li>
+  <a href="https://github.com/queelius/dualr/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
+  </a>
+</li>
+      </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
@@ -51,7 +63,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Display a dual number</h1>
-
+    <small class="dont-index">Source: <a href="https://github.com/queelius/dualr/blob/HEAD/R/dual-class.R" class="external-link"><code>R/dual-class.R</code></a></small>
     <div class="hidden name"><code>dual-show.Rd</code></div>
     </div>
 
@@ -61,10 +73,10 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'dual'</span></span>
-<span><span class="fu">show</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'dual_vector'</span></span>
-<span><span class="fu">show</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -80,6 +92,20 @@
     <p>Invisible <code>NULL</code>; called for side effect of printing.</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="dual.html">dual</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x</span>  <span class="co"># prints: &lt;dual: 3 + 1*e&gt;</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;dual: 3 + 1*e&gt;</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">dv</span> <span class="op">&lt;-</span> <span class="fu"><a href="dual_vector.html">dual_vector</a></span><span class="op">(</span><span class="fu"><a href="dual.html">dual</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="dual.html">dual</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dv</span>  <span class="co"># prints: &lt;dual_vector: 2 elements&gt;</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;dual_vector: 2 elements&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] &lt;dual: 1 + 0*e&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [2] &lt;dual: 2 + 1*e&gt;</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
@@ -88,7 +114,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by spinoza.</p>
+  <p></p><p>Developed by Alexander Towell.</p>
 </div>
 
 <div class="pkgdown">

@@ -44,8 +44,20 @@ calculus rules (sum, product, quotient, power, chain)."><!-- mathjax --><script 
     <li>
       <a href="../articles/mle-workflow.html">MLE Workflow with dualr</a>
     </li>
+    <li>
+      <a href="../articles/optimizer-integration.html">Optimizer Integration</a>
+    </li>
   </ul></li>
-      </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
+      </ul><ul class="nav navbar-nav navbar-right"><li>
+  <a href="https://github.com/queelius/dualr/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
+  </a>
+</li>
+      </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
@@ -55,7 +67,7 @@ calculus rules (sum, product, quotient, power, chain)."><!-- mathjax --><script 
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Arithmetic and comparison operators for dual numbers</h1>
-
+    <small class="dont-index">Source: <a href="https://github.com/queelius/dualr/blob/HEAD/R/dual-arithmetic.R" class="external-link"><code>R/dual-arithmetic.R</code></a></small>
     <div class="hidden name"><code>dual-arithmetic.Rd</code></div>
     </div>
 
@@ -69,13 +81,13 @@ calculus rules (sum, product, quotient, power, chain).</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'dual,dual'</span></span>
-<span><span class="fu">Ops</span><span class="op">(</span><span class="va">e1</span>, <span class="va">e2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/methods/S4groupGeneric.html" class="external-link">Ops</a></span><span class="op">(</span><span class="va">e1</span>, <span class="va">e2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'dual,numeric'</span></span>
-<span><span class="fu">Ops</span><span class="op">(</span><span class="va">e1</span>, <span class="va">e2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/methods/S4groupGeneric.html" class="external-link">Ops</a></span><span class="op">(</span><span class="va">e1</span>, <span class="va">e2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'numeric,dual'</span></span>
-<span><span class="fu">Ops</span><span class="op">(</span><span class="va">e1</span>, <span class="va">e2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/methods/S4groupGeneric.html" class="external-link">Ops</a></span><span class="op">(</span><span class="va">e1</span>, <span class="va">e2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'dual,missing'</span></span>
 <span><span class="va">e1</span> <span class="op">+</span> <span class="va">e2</span></span>
@@ -104,6 +116,29 @@ calculus rules (sum, product, quotient, power, chain).</p>
     <p>A <code>dual</code> for arithmetic ops; logical for comparisons.</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="dual_variable.html">dual_variable</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="dual_variable.html">dual_variable</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Arithmetic</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="value.html">value</a></span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">y</span><span class="op">)</span>   <span class="co"># 7</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7</span>
+<span class="r-in"><span><span class="fu"><a href="deriv.html">deriv</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span>   <span class="co"># 6 (= 2 * 3)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
+<span class="r-in"><span><span class="fu"><a href="value.html">value</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>     <span class="co"># 9</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 9</span>
+<span class="r-in"><span><span class="fu"><a href="deriv.html">deriv</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>     <span class="co"># 6</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Comparison (uses values only)</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;</span> <span class="va">y</span>   <span class="co"># TRUE</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">==</span> <span class="va">y</span>  <span class="co"># FALSE</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
@@ -112,7 +147,7 @@ calculus rules (sum, product, quotient, power, chain).</p>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by spinoza.</p>
+  <p></p><p>Developed by Alexander Towell.</p>
 </div>
 
 <div class="pkgdown">

@@ -102,6 +102,12 @@ kappas <- sapply(xs, function(x) curvature(sin, x))
 data.frame(x = round(xs, 3), curvature = round(kappas, 6))
 ```
 
+The pattern in the table reveals the geometry of $\sin(x)$: curvature is
+zero at the inflection points (integer multiples of $\pi$, where
+$\sin''(x) = 0$), and peaks at $\pi/2$ and $3\pi/2$ where $\sin$ reaches
+its extreme values. The maximum curvature of 1.0 occurs because $\sin$ has
+unit amplitude — for $A\sin(x)$ the maximum curvature would be $A$.
+
 At $x = \pi/2$, $\sin$ has maximum curvature because $|\sin''(\pi/2)| = 1$
 and $\sin'(\pi/2) = 0$:
 
@@ -165,7 +171,13 @@ data.frame(
 ```
 
 Near the expansion point, the approximation is very accurate. The error
-grows as $O(|x - x_0|^3)$. We can see this divergence visually:
+grows as $O(|x - x_0|^3)$ because the Taylor remainder is
+$\frac{f'''(\xi)}{6}(x - x_0)^3$. For $\exp(x)$ around $x_0 = 0$,
+$f'''(\xi) = \exp(\xi) \approx 1$, so the error at $x = 0.1$ is
+approximately $0.1^3/6 \approx 1.7 \times 10^{-4}$ and at $x = 0.01$ it
+drops to $\approx 1.7 \times 10^{-7}$ — a factor-of-1000 reduction for a
+factor-of-10 decrease in distance, confirming cubic convergence. We can see
+this divergence visually:
 
 ```{r fig-taylor-vs-exact, fig.width=6, fig.height=4}
 xs_plot <- seq(-2, 3, length.out = 300)
@@ -237,3 +249,21 @@ hess_helper[1, 1] - manual_hess  # ~0
 
 This shows that `hessian()` is simply an organized wrapper around the same
 nested dual arithmetic.
+
+## Summary
+
+Nested dual numbers extend forward-mode AD to second derivatives in a
+single forward pass — no symbolic differentiation, no finite-difference
+grid, and no loss of precision:
+
+- **Exact second derivatives.** By nesting $\varepsilon_1$ inside
+  $\varepsilon_2$, every arithmetic operation simultaneously propagates
+  $f(x)$, $f'(x)$, and $f''(x)$.
+- **This is the engine behind `hessian()`.** The convenience function
+  `hessian()` constructs nested duals internally for each parameter pair
+  and extracts the second-derivative matrix — the same arithmetic shown
+  in the manual construction above.
+- **Practical applications.** Curvature analysis, Taylor approximation, and
+  Newton-Raphson optimization all depend on accurate second derivatives.
+  Nested duals provide these without the step-size tuning that plagues
+  numerical second differences.

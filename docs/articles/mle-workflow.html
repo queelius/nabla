@@ -57,10 +57,23 @@
     <li>
       <a href="../articles/mle-workflow.html">MLE Workflow with dualr</a>
     </li>
+    <li>
+      <a href="../articles/optimizer-integration.html">Optimizer Integration</a>
+    </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/queelius/dualr/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -76,7 +89,7 @@
       <h1 data-toc-skip>MLE Workflow with dualr</h1>
             
       
-
+      <small class="dont-index">Source: <a href="https://github.com/queelius/dualr/blob/HEAD/vignettes/mle-workflow.Rmd" class="external-link"><code>vignettes/mle-workflow.Rmd</code></a></small>
       <div class="hidden name"><code>mle-workflow.Rmd</code></div>
 
     </div>
@@ -84,7 +97,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">dualr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/queelius/dualr" class="external-link">dualr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'dualr'</span></span>
 <span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
@@ -200,6 +213,14 @@ this simplifies.</p>
 <span><span class="co">#&gt; 1  Analytical -25.00000</span></span>
 <span><span class="co">#&gt; 2 Finite Diff -24.99974</span></span>
 <span><span class="co">#&gt; 3          AD -25.00000</span></span></code></pre></div>
+<p>All three methods agree to machine precision for this simple
+quadratic log-likelihood. The score is linear in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>
+and the Hessian is constant
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mi>n</mi><mi>/</mi><msup><mi>σ</mi><mn>2</mn></msup><mo>=</mo><mo>−</mo><mn>25</mn></mrow><annotation encoding="application/x-tex">-n/\sigma^2 = -25</annotation></semantics></math>),
+so there are no higher-order terms for finite differences to approximate
+poorly. This model serves as a sanity check that the AD machinery is
+wired correctly.</p>
 <p>The <code><a href="../reference/observed_information.html">observed_information()</a></code> function returns the negative
 Hessian:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -283,6 +304,15 @@ are unknown. The log-likelihood is:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\nMax absolute difference:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">ad_hess2</span> <span class="op">-</span> <span class="va">analytical_hess2</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Max absolute difference: 2.842171e-14</span></span></code></pre></div>
+<p>The maximum absolute difference between the AD and analytical
+Hessians is at the level of machine epsilon
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∼</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>14</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\sim 10^{-14}</annotation></semantics></math>),
+confirming that AD computes exact second derivatives even for this
+two-parameter model. The cross-derivative
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>∂</mi><mn>2</mn></msup><mo>ℓ</mo><mi>/</mi><mi>∂</mi><mi>μ</mi><mspace width="0.167em"></mspace><mi>∂</mi><mi>σ</mi></mrow><annotation encoding="application/x-tex">\partial^2 \ell / \partial\mu\,\partial\sigma</annotation></semantics></math>
+is non-zero when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mo>≠</mo><mover><mi>x</mi><mo accent="true">‾</mo></mover></mrow><annotation encoding="application/x-tex">\mu \ne \bar{x}</annotation></semantics></math>,
+exercising the mixed-partial logic in nested dual arithmetic.</p>
 </div>
 <div class="section level2">
 <h2 id="poisson-distribution-unknown-lambda">Poisson distribution: unknown lambda<a class="anchor" aria-label="anchor" href="#poisson-distribution-unknown-lambda"></a>
@@ -327,6 +357,49 @@ Poisson(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><seman
 <span><span class="co">#&gt;   quantity analytical finite_diff        AD</span></span>
 <span><span class="co">#&gt; 1    Score   13.66667    13.66667  13.66667</span></span>
 <span><span class="co">#&gt; 2  Hessian  -31.22222   -31.22238 -31.22222</span></span></code></pre></div>
+<p>Again, all three methods agree exactly. The Poisson log-likelihood
+involves only <code>log(lambda)</code> and linear terms in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>,
+so the sufficient statistics produce clean rational expressions for the
+score and Hessian — making this an ideal test case for verifying AD
+correctness.</p>
+<div class="section level3">
+<h3 id="visualizing-the-score-function">Visualizing the score function<a class="anchor" aria-label="anchor" href="#visualizing-the-score-function"></a>
+</h3>
+<p>The score (gradient) of a log-likelihood is zero at the MLE. We can
+see this by plotting the log-likelihood and its score together:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lam_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">2.0</span>, <span class="fl">5.5</span>, length.out <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compute log-likelihood and score over the grid</span></span>
+<span><span class="va">ll_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">lam_grid</span>, <span class="kw">function</span><span class="op">(</span><span class="va">l</span><span class="op">)</span> <span class="fu">ll_poisson</span><span class="op">(</span><span class="va">l</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">sc_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">lam_grid</span>, <span class="kw">function</span><span class="op">(</span><span class="va">l</span><span class="op">)</span> <span class="fu"><a href="../reference/score.html">score</a></span><span class="op">(</span><span class="va">ll_poisson</span>, <span class="va">l</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">mle_lam</span> <span class="op">&lt;-</span> <span class="va">sum_x_pois</span> <span class="op">/</span> <span class="va">n_pois</span>  <span class="co"># analytical MLE</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">4.5</span>, <span class="fl">2</span>, <span class="fl">4.5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lam_grid</span>, <span class="va">ll_vals</span>, type <span class="op">=</span> <span class="st">"l"</span>, col <span class="op">=</span> <span class="st">"steelblue"</span>, lwd <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>     xlab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span>, ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu">ell</span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>     main <span class="op">=</span> <span class="st">"Poisson log-likelihood and score"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>new <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lam_grid</span>, <span class="va">sc_vals</span>, type <span class="op">=</span> <span class="st">"l"</span>, col <span class="op">=</span> <span class="st">"firebrick"</span>, lwd <span class="op">=</span> <span class="fl">2</span>, lty <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>     axes <span class="op">=</span> <span class="cn">FALSE</span>, xlab <span class="op">=</span> <span class="st">""</span>, ylab <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">4</span>, col.axis <span class="op">=</span> <span class="st">"firebrick"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/mtext.html" class="external-link">mtext</a></span><span class="op">(</span><span class="st">"Score"</span>, side <span class="op">=</span> <span class="fl">4</span>, line <span class="op">=</span> <span class="fl">2.5</span>, col <span class="op">=</span> <span class="st">"firebrick"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="fl">0</span>, col <span class="op">=</span> <span class="st">"grey60"</span>, lty <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">mle_lam</span>, col <span class="op">=</span> <span class="st">"grey40"</span>, lty <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">mle_lam</span>, <span class="fl">0</span>, pch <span class="op">=</span> <span class="fl">4</span>, col <span class="op">=</span> <span class="st">"firebrick"</span>, cex <span class="op">=</span> <span class="fl">1.5</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>,</span>
+<span>       legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu">ell</span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span><span class="op">)</span>, <span class="st">"Score"</span>, <span class="st">"MLE"</span><span class="op">)</span>,</span>
+<span>       col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"steelblue"</span>, <span class="st">"firebrick"</span>, <span class="st">"grey40"</span><span class="op">)</span>,</span>
+<span>       lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="cn">NA</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>       bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="mle-workflow_files/figure-html/fig-poisson-score-1.png" class="r-plt" width="576"></p>
+<p>The score crosses zero exactly at the MLE
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>λ</mi><mo accent="true">̂</mo></mover><mo>=</mo><mover><mi>x</mi><mo accent="true">‾</mo></mover></mrow><annotation encoding="application/x-tex">\hat\lambda = \bar{x}</annotation></semantics></math>),
+confirming that our AD-computed gradient is consistent with the
+analytical solution.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="gamma-distribution-unknown-shape-known-rate">Gamma distribution: unknown shape, known rate<a class="anchor" aria-label="anchor" href="#gamma-distribution-unknown-shape-known-rate"></a>
@@ -339,7 +412,7 @@ has log-likelihood:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ℓ</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>α</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>α</mi><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>∑</mo><mo>log</mo><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><mi>n</mi><mo>log</mo><mi>Γ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>α</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>n</mi><mi>α</mi><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>β</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>β</mi><mo>∑</mo><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\ell(\alpha) = (\alpha - 1)\sum \log x_i - n\log\Gamma(\alpha) + n\alpha\log(\beta) - \beta\sum x_i</annotation></semantics></math></p>
 <p>This is interesting because it involves <code>lgamma</code> and
 <code>digamma</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">99</span><span class="op">)</span></span>
 <span><span class="va">data_gamma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">60</span>, shape <span class="op">=</span> <span class="fl">2.5</span>, rate <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">n_gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">data_gamma</span><span class="op">)</span></span>
@@ -377,6 +450,16 @@ has log-likelihood:</p>
 <span><span class="co">#&gt;   quantity analytical finite_diff        AD</span></span>
 <span><span class="co">#&gt; 1    Score   16.97943    16.97943  16.97943</span></span>
 <span><span class="co">#&gt; 2  Hessian  -38.69604   -38.69602 -38.69604</span></span></code></pre></div>
+<p>The Gamma model is a key differentiator between AD and finite
+differences. The log-likelihood involves <code>lgamma(alpha)</code>,
+whose derivatives are <code>digamma</code> and <code>trigamma</code> —
+special functions that <code>dualr</code> propagates exactly through the
+chain rule. With finite differences, choosing a good step size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
+for <code>lgamma</code> is tricky: too large introduces truncation error
+in the rapidly-varying digamma function, too small amplifies round-off.
+AD sidesteps this entirely by computing the exact <code>digamma</code>
+and <code>trigamma</code> values at each evaluation point.</p>
 </div>
 <div class="section level2">
 <h2 id="logistic-regression-2-predictors">Logistic regression: 2 predictors<a class="anchor" aria-label="anchor" href="#logistic-regression-2-predictors"></a>
@@ -389,7 +472,7 @@ and coefficients
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>ℓ</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>β</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><mo minsize="1.2" maxsize="1.2" stretchy="false" form="prefix">[</mo><msub><mi>y</mi><mi>i</mi></msub><msub><mi>η</mi><mi>i</mi></msub><mo>−</mo><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><msup><mi>e</mi><msub><mi>η</mi><mi>i</mi></msub></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo minsize="1.2" maxsize="1.2" stretchy="false" form="postfix">]</mo><mo>,</mo><mspace width="1.0em"></mspace><msub><mi>η</mi><mi>i</mi></msub><mo>=</mo><msub><mi>X</mi><mi>i</mi></msub><mi>β</mi></mrow><annotation encoding="application/x-tex">\ell(\beta) = \sum_{i=1}^n \bigl[y_i \eta_i - \log(1 + e^{\eta_i})\bigr],
 \quad \eta_i = X_i \beta</annotation></semantics></math></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">7</span><span class="op">)</span></span>
 <span><span class="va">n_lr</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
 <span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_lr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_lr</span><span class="op">)</span><span class="op">)</span>  <span class="co"># intercept + 2 predictors</span></span>
@@ -436,6 +519,15 @@ and coefficients
 <span><span class="co"># Hessian comparison</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Max |AD - numerical| in Hessian:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">ad_hess_lr</span> <span class="op">-</span> <span class="va">num_hess_lr</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Max |AD - numerical| in Hessian: 2.56111e-05</span></span></code></pre></div>
+<p>The numerical Hessian difference
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∼</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\sim 10^{-5}</annotation></semantics></math>)
+is noticeably larger than in the earlier models. This is because the
+logistic log-likelihood is computed via a loop over
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>50</mn></mrow><annotation encoding="application/x-tex">n = 50</annotation></semantics></math>
+observations, and each finite-difference perturbation accumulates small
+errors across all iterations. AD remains exact regardless of the number
+of loop iterations — each arithmetic operation propagates derivatives
+without approximation.</p>
 </div>
 <div class="section level2">
 <h2 id="newton-raphson-optimizer">Newton-Raphson optimizer<a class="anchor" aria-label="anchor" href="#newton-raphson-optimizer"></a>
@@ -448,7 +540,7 @@ where
 is the score and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>H</mi><annotation encoding="application/x-tex">H</annotation></semantics></math>
 is the Hessian.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">newton_raphson</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">loglik</span>, <span class="va">theta0</span>, <span class="va">tol</span> <span class="op">=</span> <span class="fl">1e-8</span>, <span class="va">max_iter</span> <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">theta</span> <span class="op">&lt;-</span> <span class="va">theta0</span></span>
 <span>  <span class="kw">for</span> <span class="op">(</span><span class="va">iter</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">max_iter</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -477,6 +569,73 @@ is the Hessian.</p>
 <span><span class="co">#&gt; Analytical MLE: mu = 5.06503  sigma = 2.072274</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Max difference:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">result_nr</span><span class="op">$</span><span class="va">estimate</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mle_mu</span>, <span class="va">mle_sigma</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Max difference: 1.776357e-15</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="contour-plot-normalmu-sigma-log-likelihood-surface">Contour plot: Normal(mu, sigma) log-likelihood surface<a class="anchor" aria-label="anchor" href="#contour-plot-normalmu-sigma-log-likelihood-surface"></a>
+</h3>
+<p>The two-parameter Normal model has a log-likelihood surface we can
+visualize with contours. The MLE sits at the peak:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mu_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">4.0</span>, <span class="fl">6.0</span>, length.out <span class="op">=</span> <span class="fl">80</span><span class="op">)</span></span>
+<span><span class="va">sigma_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="fl">2.8</span>, length.out <span class="op">=</span> <span class="fl">80</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Evaluate log-likelihood on the grid</span></span>
+<span><span class="va">ll_surface</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/outer.html" class="external-link">outer</a></span><span class="op">(</span><span class="va">mu_grid</span>, <span class="va">sigma_grid</span>, <span class="fu"><a href="https://rdrr.io/r/base/Vectorize.html" class="external-link">Vectorize</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">m</span>, <span class="va">s</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">ll_normal_2</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">m</span>, <span class="va">s</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/contour.html" class="external-link">contour</a></span><span class="op">(</span><span class="va">mu_grid</span>, <span class="va">sigma_grid</span>, <span class="va">ll_surface</span>, nlevels <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>        xlab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span>, ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">sigma</span><span class="op">)</span>,</span>
+<span>        main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="st">"Log-likelihood contours: Normal("</span> <span class="op">*</span> <span class="va">mu</span> <span class="op">*</span> <span class="st">", "</span> <span class="op">*</span> <span class="va">sigma</span> <span class="op">*</span> <span class="st">")"</span><span class="op">)</span>,</span>
+<span>        col <span class="op">=</span> <span class="st">"steelblue"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">mle_mu</span>, <span class="va">mle_sigma</span>, pch <span class="op">=</span> <span class="fl">3</span>, col <span class="op">=</span> <span class="st">"firebrick"</span>, cex <span class="op">=</span> <span class="fl">2</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text</a></span><span class="op">(</span><span class="va">mle_mu</span> <span class="op">+</span> <span class="fl">0.15</span>, <span class="va">mle_sigma</span>, <span class="st">"MLE"</span>, col <span class="op">=</span> <span class="st">"firebrick"</span>, cex <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span></span></code></pre></div>
+<p><img src="mle-workflow_files/figure-html/fig-normal-contour-1.png" class="r-plt" width="576"></p>
+</div>
+<div class="section level3">
+<h3 id="newton-raphson-convergence-path">Newton-Raphson convergence path<a class="anchor" aria-label="anchor" href="#newton-raphson-convergence-path"></a>
+</h3>
+<p>We can visualize how Newton-Raphson converges to the MLE by recording
+the parameter estimates at each iteration and overlaying them on the
+contour plot:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Newton-Raphson with trace</span></span>
+<span><span class="va">newton_raphson_trace</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">loglik</span>, <span class="va">theta0</span>, <span class="va">tol</span> <span class="op">=</span> <span class="fl">1e-8</span>, <span class="va">max_iter</span> <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">theta</span> <span class="op">&lt;-</span> <span class="va">theta0</span></span>
+<span>  <span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">theta</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">iter</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">max_iter</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/score.html">score</a></span><span class="op">(</span><span class="va">loglik</span>, <span class="va">theta</span><span class="op">)</span></span>
+<span>    <span class="va">H</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hessian.html">hessian</a></span><span class="op">(</span><span class="va">loglik</span>, <span class="va">theta</span><span class="op">)</span></span>
+<span>    <span class="va">step</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">H</span>, <span class="va">s</span><span class="op">)</span></span>
+<span>    <span class="va">theta</span> <span class="op">&lt;-</span> <span class="va">theta</span> <span class="op">-</span> <span class="va">step</span></span>
+<span>    <span class="va">trace</span><span class="op">[[</span><span class="va">iter</span> <span class="op">+</span> <span class="fl">1L</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">theta</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;</span> <span class="va">tol</span><span class="op">)</span> <span class="kw">break</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>estimate <span class="op">=</span> <span class="va">theta</span>, iterations <span class="op">=</span> <span class="va">iter</span>, trace <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">trace</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">result_trace</span> <span class="op">&lt;-</span> <span class="fu">newton_raphson_trace</span><span class="op">(</span><span class="va">ll_normal_2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/contour.html" class="external-link">contour</a></span><span class="op">(</span><span class="va">mu_grid</span>, <span class="va">sigma_grid</span>, <span class="va">ll_surface</span>, nlevels <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>        xlab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span>, ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">sigma</span><span class="op">)</span>,</span>
+<span>        main <span class="op">=</span> <span class="st">"Newton-Raphson convergence path"</span>,</span>
+<span>        col <span class="op">=</span> <span class="st">"grey70"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">result_trace</span><span class="op">$</span><span class="va">trace</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, <span class="va">result_trace</span><span class="op">$</span><span class="va">trace</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>,</span>
+<span>      col <span class="op">=</span> <span class="st">"firebrick"</span>, lwd <span class="op">=</span> <span class="fl">2</span>, type <span class="op">=</span> <span class="st">"o"</span>, pch <span class="op">=</span> <span class="fl">19</span>, cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">result_trace</span><span class="op">$</span><span class="va">trace</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="va">result_trace</span><span class="op">$</span><span class="va">trace</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">]</span>,</span>
+<span>       pch <span class="op">=</span> <span class="fl">17</span>, col <span class="op">=</span> <span class="st">"orange"</span>, cex <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">mle_mu</span>, <span class="va">mle_sigma</span>, pch <span class="op">=</span> <span class="fl">3</span>, col <span class="op">=</span> <span class="st">"steelblue"</span>, cex <span class="op">=</span> <span class="fl">2</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>,</span>
+<span>       legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"N-R path"</span>, <span class="st">"Start"</span>, <span class="st">"MLE"</span><span class="op">)</span>,</span>
+<span>       col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"firebrick"</span>, <span class="st">"orange"</span>, <span class="st">"steelblue"</span><span class="op">)</span>,</span>
+<span>       pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">19</span>, <span class="fl">17</span>, <span class="fl">3</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="cn">NA</span>, <span class="cn">NA</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="cn">NA</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>       bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="mle-workflow_files/figure-html/fig-nr-path-1.png" class="r-plt" width="576"></p>
+<p>Newton-Raphson converges in 10 iterations — fast quadratic
+convergence is a hallmark of having exact gradient and Hessian
+information from AD.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="score_and_hessian-differentiating-the-score">
@@ -485,7 +644,7 @@ is the Hessian.</p>
 <p>When you have an analytical score function,
 <code><a href="../reference/score_and_hessian.html">score_and_hessian()</a></code> differentiates it to obtain the
 Hessian. This is useful when the score has been simplified by hand.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Analytical score for Normal(mu, sigma) model</span></span>
 <span><span class="va">score_normal</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">mu</span> <span class="op">&lt;-</span> <span class="va">theta</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
@@ -522,6 +681,38 @@ Hessian. This is useful when the score has been simplified by hand.</p>
 exact AD — one differentiates the log-likelihood twice, the other
 differentiates the score once.</p>
 </div>
+<div class="section level2">
+<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
+</h2>
+<p>Across five models of increasing complexity, several patterns
+emerge:</p>
+<ul>
+<li>
+<strong>AD matches analytical derivatives to machine
+precision.</strong> Whether the log-likelihood involves simple
+polynomials (Normal), special functions (<code>lgamma</code> in Gamma),
+or loops over observations (logistic regression), <code><a href="../reference/score.html">score()</a></code>
+and <code><a href="../reference/hessian.html">hessian()</a></code> return exact results.</li>
+<li>
+<strong>Finite differences introduce step-size-dependent
+error.</strong> For simple models the error is negligible
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∼</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>10</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\sim 10^{-10}</annotation></semantics></math>),
+but for loop-based likelihoods it grows to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∼</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\sim 10^{-5}</annotation></semantics></math>
+— large enough to affect optimization convergence and standard error
+estimates.</li>
+<li>
+<strong><code><a href="../reference/score_and_hessian.html">score_and_hessian()</a></code> is useful when the score
+has been simplified by hand.</strong> It avoids differentiating the full
+log-likelihood twice, instead differentiating the (simpler) score
+function once to obtain the Hessian.</li>
+<li>
+<strong>Newton-Raphson with AD gradients converges in few
+iterations.</strong> The exact Hessian provides the quadratic
+convergence that Newton’s method promises in theory — no line search or
+quasi-Newton approximation needed.</li>
+</ul>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -534,7 +725,7 @@ differentiates the score once.</p>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by spinoza.</p>
+<p>Developed by Alexander Towell.</p>
 </div>
 
 <div class="pkgdown">

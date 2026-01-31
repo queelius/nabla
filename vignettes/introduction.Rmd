@@ -272,9 +272,14 @@ data.frame(
 )
 ```
 
-The AD result matches the analytical derivative to machine precision, while
-finite differences introduce truncation error. A bar chart makes this
-difference vivid:
+The AD result matches the analytical derivative to machine precision — zero
+error — because dual-number arithmetic propagates exact derivative rules
+through every operation. Finite differences, by contrast, introduce
+truncation error of order $O(h^2)$ for central differences; here the error
+is roughly $10^{-7}$, reflecting the choice of $h = 10^{-8}$ (the optimal
+step size for double-precision central differences is approximately
+$\epsilon_{\mathrm{mach}}^{1/3} \approx 6 \times 10^{-6}$, so our step is
+in the right ballpark). A bar chart makes this difference vivid:
 
 ```{r fig-error-comparison, fig.width=5, fig.height=3.5}
 errors <- abs(c(finite_diff - analytical, ad_result - analytical))
@@ -295,3 +300,19 @@ text(mean(bp), log10(.Machine$double.eps) + 0.8,
 
 This advantage becomes critical for optimization algorithms that depend on
 accurate gradients.
+
+## What's next?
+
+This vignette covered the fundamentals of dual-number arithmetic and showed
+that AD computes exact derivatives where finite differences cannot.
+To see how this pays off in practice:
+
+- **`vignette("mle-workflow")`** applies `score()`, `hessian()`, and
+  `observed_information()` to five increasingly complex MLE problems, from
+  Normal to logistic regression, and builds a Newton-Raphson optimizer
+  powered entirely by AD.
+- **`vignette("higher-order")`** demonstrates nested duals for second
+  derivatives, with applications to curvature analysis and Taylor expansion.
+- **`vignette("optimizer-integration")`** shows how to plug `dualr`
+  gradients into R's built-in optimizers (`optim`, `nlminb`) for
+  production-quality MLE fitting.
