@@ -1,0 +1,8 @@
+bibentry(
+  bibtype  = "Manual",
+  title    = "dualr: Forward-Mode Automatic Differentiation via Dual Numbers",
+  author   = person("Alexander", "Towell"),
+  year     = "2026",
+  note     = "R package version 0.1.0",
+  url      = "https://github.com/queelius/dualr"
+)

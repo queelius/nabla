@@ -1,0 +1,239 @@
+---
+title: "Higher-Order Derivatives"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Higher-Order Derivatives}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r setup}
+library(dualr)
+```
+
+## Nested duals
+
+First-order duals give us $f(x)$ and $f'(x)$. To also get $f''(x)$, `dualr`
+uses **nested duals** — a dual number whose components are themselves dual
+numbers.
+
+The structure `dual(dual(x, 1), dual(1, 0))` simultaneously tracks:
+
+- $f(x)$ — the value of the inner value
+- $f'(x)$ — the derivative of the inner value
+- $f''(x)$ — the derivative of the outer derivative
+
+```{r}
+x <- dual2_variable(2)
+
+# Evaluate x^3
+result <- x^3
+
+# Extract all three quantities
+value2(result)       # f(2) = 8
+first_deriv(result)  # f'(2) = 3*4 = 12
+second_deriv(result) # f''(2) = 6*2 = 12
+```
+
+For constants in second-order computations, use `dual2_constant()`:
+
+```{r}
+k <- dual2_constant(5)
+value2(k)        # 5
+first_deriv(k)   # 0
+second_deriv(k)  # 0
+```
+
+## The `differentiate2()` helper
+
+For quick evaluation, `differentiate2()` wraps the construction and extraction:
+
+```{r}
+# Differentiate sin(x) at x = pi/4
+result <- differentiate2(sin, pi / 4)
+result$value   # sin(pi/4)
+result$first   # cos(pi/4) = f'
+result$second  # -sin(pi/4) = f''
+```
+
+Verify against known values:
+
+```{r}
+result$value - sin(pi / 4)      # ~0
+result$first - cos(pi / 4)      # ~0
+result$second - (-sin(pi / 4))  # ~0
+```
+
+More complex functions work too:
+
+```{r}
+f <- function(x) x * exp(-x^2)
+d2 <- differentiate2(f, 1)
+
+# Analytical: f'(x) = exp(-x^2)(1 - 2x^2)
+# f''(x) = exp(-x^2)(-6x + 4x^3)
+analytical_f1 <- exp(-1) * (1 - 2)
+analytical_f2 <- exp(-1) * (-6 + 4)
+d2$first - analytical_f1   # ~0
+d2$second - analytical_f2  # ~0
+```
+
+## Curvature analysis
+
+The curvature of a curve $y = f(x)$ is:
+
+$$\kappa = \frac{|f''(x)|}{(1 + f'(x)^2)^{3/2}}$$
+
+With second-order AD, we can compute this directly:
+
+```{r}
+curvature <- function(f, x) {
+  d2 <- differentiate2(f, x)
+  abs(d2$second) / (1 + d2$first^2)^(3/2)
+}
+
+# Curvature of sin(x) at various points
+xs <- seq(0, 2 * pi, length.out = 7)
+kappas <- sapply(xs, function(x) curvature(sin, x))
+data.frame(x = round(xs, 3), curvature = round(kappas, 6))
+```
+
+At $x = \pi/2$, $\sin$ has maximum curvature because $|\sin''(\pi/2)| = 1$
+and $\sin'(\pi/2) = 0$:
+
+```{r}
+curvature(sin, pi / 2)  # should be 1.0
+```
+
+### Visualizing curvature along sin(x)
+
+Curvature peaks where the second derivative is largest in magnitude and the
+first derivative is small. For $\sin(x)$, this occurs at $\pi/2$ and $3\pi/2$:
+
+```{r fig-sin-curvature, fig.width=6, fig.height=4}
+xs_curve <- seq(0, 2 * pi, length.out = 200)
+sin_vals <- sin(xs_curve)
+kappa_vals <- sapply(xs_curve, function(x) curvature(sin, x))
+
+par(mar = c(4, 4.5, 2, 4.5))
+plot(xs_curve, sin_vals, type = "l", col = "steelblue", lwd = 2,
+     xlab = "x", ylab = "sin(x)",
+     main = "sin(x) and its curvature")
+par(new = TRUE)
+plot(xs_curve, kappa_vals, type = "l", col = "firebrick", lwd = 2, lty = 2,
+     axes = FALSE, xlab = "", ylab = "")
+axis(4, col.axis = "firebrick")
+mtext(expression(kappa(x)), side = 4, line = 2.5, col = "firebrick")
+abline(v = c(pi / 2, 3 * pi / 2), col = "grey60", lty = 3)
+legend("bottom",
+       legend = c("sin(x)", expression(kappa(x))),
+       col = c("steelblue", "firebrick"), lty = c(1, 2), lwd = 2,
+       bty = "n", horiz = TRUE)
+```
+
+The curvature reaches its maximum of 1.0 at $x = \pi/2$ (where $\sin'(x) = 0$
+and $|\sin''(x)| = 1$) and returns to zero at integer multiples of $\pi$
+(where $\sin''(x) = 0$).
+
+## Taylor expansion
+
+A second-order Taylor approximation of $f$ around $x_0$:
+
+$$f(x) \approx f(x_0) + f'(x_0)(x - x_0) + \frac{1}{2} f''(x_0)(x - x_0)^2$$
+
+We can compute this using nested duals:
+
+```{r}
+taylor2 <- function(f, x0, x) {
+  d2 <- differentiate2(f, x0)
+  d2$value + d2$first * (x - x0) + 0.5 * d2$second * (x - x0)^2
+}
+
+# Approximate exp(x) near x = 0
+f_exp <- function(x) exp(x)
+xs <- c(-0.1, -0.01, 0, 0.01, 0.1)
+data.frame(
+  x = xs,
+  exact = exp(xs),
+  taylor2 = sapply(xs, function(x) taylor2(f_exp, 0, x)),
+  error = exp(xs) - sapply(xs, function(x) taylor2(f_exp, 0, x))
+)
+```
+
+Near the expansion point, the approximation is very accurate. The error
+grows as $O(|x - x_0|^3)$. We can see this divergence visually:
+
+```{r fig-taylor-vs-exact, fig.width=6, fig.height=4}
+xs_plot <- seq(-2, 3, length.out = 300)
+exact_vals <- exp(xs_plot)
+taylor_vals <- sapply(xs_plot, function(x) taylor2(f_exp, 0, x))
+
+par(mar = c(4, 4, 2, 1))
+plot(xs_plot, exact_vals, type = "l", col = "steelblue", lwd = 2,
+     xlab = "x", ylab = "y",
+     main = expression("exp(x) vs 2nd-order Taylor at " * x[0] == 0),
+     ylim = c(-1, 12))
+lines(xs_plot, taylor_vals, col = "firebrick", lwd = 2, lty = 2)
+abline(v = 0, col = "grey60", lty = 3)
+points(0, 1, pch = 19, col = "grey40", cex = 1.2)
+legend("topleft",
+       legend = c("exp(x)", expression("Taylor " * T[2](x))),
+       col = c("steelblue", "firebrick"), lty = c(1, 2), lwd = 2,
+       bty = "n")
+```
+
+The Taylor polynomial matches `exp(x)` closely near $x_0 = 0$ but diverges
+at larger distances, illustrating the local nature of polynomial approximation.
+
+## Connection to MLE: Hessian via nested duals
+
+The `hessian()` function in `dualr` uses nested duals internally. We can
+verify this by manually constructing a second-order dual for a log-likelihood
+and comparing with the `hessian()` helper.
+
+Consider a Poisson log-likelihood for $\lambda$:
+
+```{r}
+set.seed(123)
+data_pois <- rpois(50, lambda = 3)
+n <- length(data_pois)
+sum_x <- sum(data_pois)
+sum_lfact <- sum(lfactorial(data_pois))
+
+ll_poisson <- function(theta) {
+  lambda <- theta[1]
+  sum_x * log(lambda) - n * lambda - sum_lfact
+}
+
+lambda0 <- 2.5
+```
+
+**Method 1**: Using `hessian()` helper:
+
+```{r}
+hess_helper <- hessian(ll_poisson, lambda0)
+hess_helper
+```
+
+**Method 2**: Manual nested dual construction:
+
+```{r}
+# Build a dual2_variable wrapped in a dual_vector
+manual_theta <- dual_vector(list(dual2_variable(lambda0)))
+result_manual <- ll_poisson(manual_theta)
+manual_hess <- deriv(deriv(result_manual))
+manual_hess
+```
+
+Both approaches yield the same result:
+
+```{r}
+hess_helper[1, 1] - manual_hess  # ~0
+```
+
+This shows that `hessian()` is simply an organized wrapper around the same
+nested dual arithmetic.
