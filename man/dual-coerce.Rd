@@ -2,10 +2,10 @@
 % Please edit documentation in R/dual-class.R
 \name{dual-coerce}
 \alias{dual-coerce}
-\alias{as.numeric,dual-method}
+\alias{as.numeric,dualr-method}
 \title{Coerce dual to numeric}
 \usage{
-\S4method{as.numeric}{dual}(x, ...)
+\S4method{as.numeric}{dualr}(x, ...)
 }
 \arguments{
 \item{x}{A \code{dual} object.}

@@ -2,10 +2,16 @@
 % Please edit documentation in R/dual-math.R
 \name{dual-math}
 \alias{dual-math}
-\alias{Math,dual-method}
+\alias{Math,dualr-method}
+\alias{exp,dualr-method}
+\alias{sqrt,dualr-method}
 \title{Math group generic for dual numbers}
 \usage{
-\S4method{Math}{dual}(x)
+\S4method{exp}{dualr}(x)
+
+\S4method{sqrt}{dualr}(x)
+
+\S4method{Math}{dualr}(x)
 }
 \arguments{
 \item{x}{A \code{dual} number.}

@@ -26,10 +26,9 @@ setMethod("erf", "numeric", function(x) {
 
 #' @rdname erf
 #' @export
-setMethod("erf", "dual", function(x) {
-  v <- value(x)
-  d <- deriv(x)
-  dual(erf(v), d * (2 / sqrt(pi)) * exp(-v * v))
+setMethod("erf", "dualr", function(x) {
+  v <- x@value
+  .dual(erf(v), x@deriv * (2 / sqrt(pi)) * exp(-v * v))
 })
 
 #' Complementary error function
@@ -53,10 +52,9 @@ setMethod("erfc", "numeric", function(x) {
 
 #' @rdname erfc
 #' @export
-setMethod("erfc", "dual", function(x) {
-  v <- value(x)
-  d <- deriv(x)
-  dual(erfc(v), -d * (2 / sqrt(pi)) * exp(-v * v))
+setMethod("erfc", "dualr", function(x) {
+  v <- x@value
+  .dual(erfc(v), -x@deriv * (2 / sqrt(pi)) * exp(-v * v))
 })
 
 # -- Beta functions ------------------------------------------------------------
@@ -81,27 +79,33 @@ setMethod("lbeta", signature(a = "numeric", b = "numeric"), function(a, b) {
 
 #' @rdname lbeta
 #' @export
-setMethod("lbeta", signature(a = "dual", b = "dual"), function(a, b) {
-  va <- value(a); da <- deriv(a)
-  vb <- value(b); db <- deriv(b)
+setMethod("lbeta", signature(a = "dualr", b = "dualr"), function(a, b) {
+  va <- a@value; da <- a@deriv
+  vb <- b@value; db <- b@deriv
   lbv <- base::lbeta(va, vb)
   # d/da lbeta(a,b) = digamma(a) - digamma(a+b)
   # d/db lbeta(a,b) = digamma(b) - digamma(a+b)
   dab <- digamma(va + vb)
   drv <- da * (digamma(va) - dab) + db * (digamma(vb) - dab)
-  dual(lbv, drv)
+  .dual(lbv, drv)
 })
 
 #' @rdname lbeta
 #' @export
-setMethod("lbeta", signature(a = "dual", b = "numeric"), function(a, b) {
-  lbeta(a, dual(b, 0))
+setMethod("lbeta", signature(a = "dualr", b = "numeric"), function(a, b) {
+  va <- a@value; da <- a@deriv
+  lbv <- base::lbeta(va, b)
+  dab <- digamma(va + b)
+  .dual(lbv, da * (digamma(va) - dab))
 })
 
 #' @rdname lbeta
 #' @export
-setMethod("lbeta", signature(a = "numeric", b = "dual"), function(a, b) {
-  lbeta(dual(a, 0), b)
+setMethod("lbeta", signature(a = "numeric", b = "dualr"), function(a, b) {
+  vb <- b@value; db <- b@deriv
+  lbv <- base::lbeta(a, vb)
+  dab <- digamma(a + vb)
+  .dual(lbv, db * (digamma(vb) - dab))
 })
 
 #' Beta function for dual numbers
@@ -126,20 +130,20 @@ setMethod("beta", signature(a = "numeric", b = "numeric"), function(a, b) {
 
 #' @rdname beta
 #' @export
-setMethod("beta", signature(a = "dual", b = "dual"), function(a, b) {
+setMethod("beta", signature(a = "dualr", b = "dualr"), function(a, b) {
   exp(lbeta(a, b))
 })
 
 #' @rdname beta
 #' @export
-setMethod("beta", signature(a = "dual", b = "numeric"), function(a, b) {
-  exp(lbeta(a, dual(b, 0)))
+setMethod("beta", signature(a = "dualr", b = "numeric"), function(a, b) {
+  exp(lbeta(a, b))
 })
 
 #' @rdname beta
 #' @export
-setMethod("beta", signature(a = "numeric", b = "dual"), function(a, b) {
-  exp(lbeta(dual(a, 0), b))
+setMethod("beta", signature(a = "numeric", b = "dualr"), function(a, b) {
+  exp(lbeta(a, b))
 })
 
 # -- Polygamma function --------------------------------------------------------
@@ -167,9 +171,8 @@ setMethod("psigamma", signature(x = "numeric"), function(x, deriv = 0L) {
 
 #' @rdname psigamma
 #' @export
-setMethod("psigamma", signature(x = "dual"), function(x, deriv = 0L) {
-  v <- value(x)
-  d <- deriv(x)
-  dual(base::psigamma(v, deriv = deriv),
-       d * base::psigamma(v, deriv = deriv + 1L))
+setMethod("psigamma", signature(x = "dualr"), function(x, deriv = 0L) {
+  v <- x@value
+  .dual(base::psigamma(v, deriv = deriv),
+       x@deriv * base::psigamma(v, deriv = deriv + 1L))
 })

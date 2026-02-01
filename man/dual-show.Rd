@@ -2,11 +2,11 @@
 % Please edit documentation in R/dual-class.R
 \name{dual-show}
 \alias{dual-show}
-\alias{show,dual-method}
+\alias{show,dualr-method}
 \alias{show,dual_vector-method}
 \title{Display a dual number}
 \usage{
-\S4method{show}{dual}(object)
+\S4method{show}{dualr}(object)
 
 \S4method{show}{dual_vector}(object)
 }

@@ -2,13 +2,13 @@
 % Please edit documentation in R/dual-class.R
 \name{value}
 \alias{value}
-\alias{value,dual-method}
+\alias{value,dualr-method}
 \alias{value,numeric-method}
 \title{Extract the value (primal) part of a dual number}
 \usage{
 value(d)
 
-\S4method{value}{dual}(d)
+\S4method{value}{dualr}(d)
 
 \S4method{value}{numeric}(d)
 }

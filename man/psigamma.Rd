@@ -3,14 +3,14 @@
 \name{psigamma}
 \alias{psigamma}
 \alias{psigamma,numeric-method}
-\alias{psigamma,dual-method}
+\alias{psigamma,dualr-method}
 \title{Polygamma function for dual numbers}
 \usage{
 psigamma(x, deriv = 0L)
 
 \S4method{psigamma}{numeric}(x, deriv = 0L)
 
-\S4method{psigamma}{dual}(x, deriv = 0L)
+\S4method{psigamma}{dualr}(x, deriv = 0L)
 }
 \arguments{
 \item{x}{A numeric or dual value.}

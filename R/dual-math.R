@@ -28,81 +28,102 @@
 #' deriv(log(y))  # 1/2
 #'
 #' @name dual-math
-#' @aliases Math,dual-method
+#' @aliases Math,dualr-method
 NULL
+
+# =============================================================================
+# Per-function methods for the 3 hottest math functions: exp, log, sqrt
+# These bypass the Math group generic + switch dispatch entirely.
+# =============================================================================
 
 #' @rdname dual-math
 #' @export
-setMethod("Math", "dual", function(x) {
-  v <- value(x)
-  d <- deriv(x)
+setMethod("exp", "dualr", function(x) {
+  ev <- exp(x@value)
+  .dual(ev, x@deriv * ev)
+})
+
+#' @rdname dual-math
+#' @export
+setMethod("sqrt", "dualr", function(x) {
+  sv <- sqrt(x@value)
+  .dual(sv, x@deriv / (2 * sv))
+})
+
+# =============================================================================
+# Math group generic fallback for remaining functions
+# =============================================================================
+
+#' @rdname dual-math
+#' @export
+setMethod("Math", "dualr", function(x) {
+  v <- x@value
+  d <- x@deriv
 
   switch(.Generic,
     # -- Absolute value / sign --
-    "abs"     = dual(abs(v), d * sign(v)),
-    "sign"    = dual(sign(v), 0),
+    "abs"     = .dual(abs(v), d * sign(v)),
+    "sign"    = .dual(sign(v), 0),
 
     # -- Rounding (piecewise constant, derivative 0 almost everywhere) --
-    "floor"   = dual(floor(v), 0),
-    "ceiling" = dual(ceiling(v), 0),
-    "trunc"   = dual(trunc(v), 0),
-    "round"   = dual(round(v), 0),
+    "floor"   = .dual(floor(v), 0),
+    "ceiling" = .dual(ceiling(v), 0),
+    "trunc"   = .dual(trunc(v), 0),
+    "round"   = .dual(round(v), 0),
 
-    # -- Square root --
-    "sqrt"    = dual(sqrt(v), d / (2 * sqrt(v))),
+    # Note: sqrt, exp, and log have dedicated setMethod() dispatches above
+    # (and for log, below) that take priority over this group generic.
 
     # -- Exponential / logarithm --
-    "exp"     = { ev <- exp(v); dual(ev, d * ev) },
-    "expm1"   = dual(expm1(v), d * exp(v)),
-    "log"     = dual(log(v), d / v),
-    "log2"    = dual(log2(v), d / (v * log(2))),
-    "log10"   = dual(log10(v), d / (v * log(10))),
-    "log1p"   = dual(log1p(v), d / (1 + v)),
+    "expm1"   = .dual(expm1(v), d * exp(v)),
+    "log2"    = .dual(log2(v), d / (v * log(2))),
+    "log10"   = .dual(log10(v), d / (v * log(10))),
+    "log1p"   = .dual(log1p(v), d / (1 + v)),
 
     # -- Trigonometric --
-    "cos"     = dual(cos(v), -d * sin(v)),
-    "sin"     = dual(sin(v), d * cos(v)),
-    "tan"     = { cv <- cos(v); dual(tan(v), d / (cv * cv)) },
-    "cospi"   = dual(cospi(v), -d * pi * sinpi(v)),
-    "sinpi"   = dual(sinpi(v), d * pi * cospi(v)),
-    "tanpi"   = { cv <- cospi(v); dual(tanpi(v), d * pi / (cv * cv)) },
+    "cos"     = .dual(cos(v), -d * sin(v)),
+    "sin"     = .dual(sin(v), d * cos(v)),
+    "tan"     = { cv <- cos(v); .dual(tan(v), d / (cv * cv)) },
+    "cospi"   = .dual(cospi(v), -d * pi * sinpi(v)),
+    "sinpi"   = .dual(sinpi(v), d * pi * cospi(v)),
+    "tanpi"   = { cv <- cospi(v); .dual(tanpi(v), d * pi / (cv * cv)) },
 
     # -- Inverse trigonometric --
-    "acos"    = dual(acos(v), -d / sqrt(1 - v * v)),
-    "asin"    = dual(asin(v), d / sqrt(1 - v * v)),
-    "atan"    = dual(atan(v), d / (1 + v * v)),
+    "acos"    = .dual(acos(v), -d / sqrt(1 - v * v)),
+    "asin"    = .dual(asin(v), d / sqrt(1 - v * v)),
+    "atan"    = .dual(atan(v), d / (1 + v * v)),
 
     # -- Hyperbolic --
-    "cosh"    = dual(cosh(v), d * sinh(v)),
-    "sinh"    = dual(sinh(v), d * cosh(v)),
-    "tanh"    = { tv <- tanh(v); dual(tv, d * (1 - tv * tv)) },
+    "cosh"    = .dual(cosh(v), d * sinh(v)),
+    "sinh"    = .dual(sinh(v), d * cosh(v)),
+    "tanh"    = { tv <- tanh(v); .dual(tv, d * (1 - tv * tv)) },
 
     # -- Inverse hyperbolic --
-    "acosh"   = dual(acosh(v), d / sqrt(v * v - 1)),
-    "asinh"   = dual(asinh(v), d / sqrt(v * v + 1)),
-    "atanh"   = dual(atanh(v), d / (1 - v * v)),
+    "acosh"   = .dual(acosh(v), d / sqrt(v * v - 1)),
+    "asinh"   = .dual(asinh(v), d / sqrt(v * v + 1)),
+    "atanh"   = .dual(atanh(v), d / (1 - v * v)),
 
     # -- Gamma-related (chain rule applied) --
     "gamma"   = {
       gv <- gamma(v)
-      dual(gv, d * gv * digamma(v))
+      .dual(gv, d * gv * digamma(v))
     },
-    "lgamma"  = dual(lgamma(v), d * digamma(v)),
-    "digamma" = dual(digamma(v), d * trigamma(v)),
-    "trigamma" = dual(trigamma(v), d * psigamma(v, deriv = 2L)),
+    "lgamma"  = .dual(lgamma(v), d * digamma(v)),
+    "digamma" = .dual(digamma(v), d * trigamma(v)),
+    "trigamma" = .dual(trigamma(v), d * psigamma(v, deriv = 2L)),
 
     # -- Cumulative / factorial (not differentiable in usual sense) --
-    "cummax"  = dual(cummax(v), 0),
-    "cummin"  = dual(cummin(v), 0),
-    "cumsum"  = dual(cumsum(v), cumsum(d)),
+    "cummax"  = .dual(cummax(v), 0),
+    "cummin"  = .dual(cummin(v), 0),
+    "cumsum"  = .dual(cumsum(v), cumsum(d)),
     "cumprod" = {
       stop("cumprod() is not supported for dual numbers (derivative cannot be propagated). Use Reduce(\"*\", ...) instead.")
     },
     "factorial" = {
       gv <- gamma(v + 1)
-      dual(gv, d * gv * digamma(v + 1))
+      .dual(gv, d * gv * digamma(v + 1))
     },
-    "lfactorial" = dual(lfactorial(v), d * digamma(v + 1)),
+    "lfactorial" = .dual(lfactorial(v), d * digamma(v + 1)),
 
     stop(sprintf("Math function '%s' not implemented for dual numbers", .Generic))
   )
@@ -125,16 +146,16 @@ setMethod("Math", "dual", function(x) {
 #' deriv(round(x, 2))  # 0 (piecewise constant)
 #'
 #' @name dual-math2
-#' @aliases Math2,dual-method
+#' @aliases Math2,dualr-method
 NULL
 
 #' @rdname dual-math2
 #' @export
-setMethod("Math2", "dual", function(x, digits) {
-  v <- value(x)
+setMethod("Math2", "dualr", function(x, digits) {
+  v <- x@value
   switch(.Generic,
-    "round"  = dual(round(v, digits), 0),
-    "signif" = dual(signif(v, digits), 0),
+    "round"  = .dual(round(v, digits), 0),
+    "signif" = .dual(signif(v, digits), 0),
     stop(sprintf("Math2 function '%s' not implemented for dual numbers", .Generic))
   )
 })
@@ -153,28 +174,32 @@ setMethod("Math2", "dual", function(x, digits) {
 #' value(result)  # pi/4
 #'
 #' @name dual-atan2
-#' @aliases atan2,dual,dual-method atan2,dual,numeric-method atan2,numeric,dual-method
+#' @aliases atan2,dualr,dualr-method atan2,dualr,numeric-method atan2,numeric,dualr-method
 NULL
 
 #' @rdname dual-atan2
 #' @export
-setMethod("atan2", signature(y = "dual", x = "dual"), function(y, x) {
-  vy <- value(y); dy <- deriv(y)
-  vx <- value(x); dx <- deriv(x)
+setMethod("atan2", signature(y = "dualr", x = "dualr"), function(y, x) {
+  vy <- y@value; dy <- y@deriv
+  vx <- x@value; dx <- x@deriv
   denom <- vx * vx + vy * vy
-  dual(atan2(vy, vx), (vx * dy - vy * dx) / denom)
+  .dual(atan2(vy, vx), (vx * dy - vy * dx) / denom)
 })
 
 #' @rdname dual-atan2
 #' @export
-setMethod("atan2", signature(y = "dual", x = "numeric"), function(y, x) {
-  atan2(y, dual(x, 0))
+setMethod("atan2", signature(y = "dualr", x = "numeric"), function(y, x) {
+  vy <- y@value; dy <- y@deriv
+  denom <- x * x + vy * vy
+  .dual(atan2(vy, x), (x * dy) / denom)
 })
 
 #' @rdname dual-atan2
 #' @export
-setMethod("atan2", signature(y = "numeric", x = "dual"), function(y, x) {
-  atan2(dual(y, 0), x)
+setMethod("atan2", signature(y = "numeric", x = "dualr"), function(y, x) {
+  vx <- x@value; dx <- x@deriv
+  denom <- vx * vx + y * y
+  .dual(atan2(y, vx), (-y * dx) / denom)
 })
 
 # -- max and min ---------------------------------------------------------------
@@ -194,25 +219,25 @@ setMethod("atan2", signature(y = "numeric", x = "dual"), function(y, x) {
 #' value(min(x, y))  # 3
 #'
 #' @name dual-maxmin
-#' @aliases max,dual-method min,dual-method
+#' @aliases max,dualr-method min,dualr-method
 NULL
 
 #' @rdname dual-maxmin
 #' @export
-setMethod("max", signature(x = "dual"), function(x, ..., na.rm = FALSE) {
+setMethod("max", signature(x = "dualr"), function(x, ..., na.rm = FALSE) {
   args <- list(x, ...)
   if (length(args) == 1L) return(x)
   args <- lapply(args, .as_dual)
-  Reduce(function(a, b) if (value(a) >= value(b)) a else b, args)
+  Reduce(.dual_max, args)
 })
 
 #' @rdname dual-maxmin
 #' @export
-setMethod("min", signature(x = "dual"), function(x, ..., na.rm = FALSE) {
+setMethod("min", signature(x = "dualr"), function(x, ..., na.rm = FALSE) {
   args <- list(x, ...)
   if (length(args) == 1L) return(x)
   args <- lapply(args, .as_dual)
-  Reduce(function(a, b) if (value(a) <= value(b)) a else b, args)
+  Reduce(.dual_min, args)
 })
 
 # -- log with base argument ---------------------------------------------------
@@ -228,15 +253,17 @@ setMethod("min", signature(x = "dual"), function(x, ..., na.rm = FALSE) {
 #' deriv(log(x, base = 2))  # 1 / (8 * log(2))
 #'
 #' @name dual-log
-#' @aliases log,dual-method
+#' @aliases log,dualr-method
 NULL
 
 #' @rdname dual-log
 #' @export
-setMethod("log", signature(x = "dual"), function(x, base = exp(1)) {
+setMethod("log", signature(x = "dualr"), function(x, base = exp(1)) {
+  v <- x@value
+  d <- x@deriv
   if (missing(base) || identical(base, exp(1))) {
-    dual(log(value(x)), deriv(x) / value(x))
+    .dual(log(v), d / v)
   } else {
-    dual(log(value(x), base), deriv(x) / (value(x) * log(base)))
+    .dual(log(v, base), d / (v * log(base)))
   }
 })

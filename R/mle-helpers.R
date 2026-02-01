@@ -12,23 +12,25 @@
 
 .make_dual_vector <- function(theta, seed_index) {
   p <- length(theta)
-  duals <- lapply(seq_len(p), function(j) {
-    if (j == seed_index) dual(theta[j], 1) else dual(theta[j], 0)
-  })
-  dual_vector(duals)
+  duals <- vector("list", p)
+  for (j in seq_len(p)) {
+    duals[[j]] <- if (j == seed_index) .dual(theta[j], 1) else .dual(theta[j], 0)
+  }
+  new("dual_vector", duals)
 }
 
 # -- Internal: build a nested dual_vector for Hessian entry (i,j) -------------
 
 .make_dual2_vector <- function(theta, i, j) {
   p <- length(theta)
-  duals <- lapply(seq_len(p), function(k) {
+  duals <- vector("list", p)
+  for (k in seq_len(p)) {
     inner_d <- if (k == j) 1 else 0
-    inner <- dual(theta[k], inner_d)
-    outer_d <- if (k == i) dual(1, 0) else dual(0, 0)
-    dual(inner, outer_d)
-  })
-  dual_vector(duals)
+    inner <- .dual(theta[k], inner_d)
+    outer_d <- if (k == i) .dual(1, 0) else .dual(0, 0)
+    duals[[k]] <- .dual(inner, outer_d)
+  }
+  new("dual_vector", duals)
 }
 
 #' Compute the score (gradient) of a log-likelihood
@@ -38,7 +40,7 @@
 #'
 #' The log-likelihood function should use \code{theta[1]}, \code{theta[2]},
 #' etc. to access parameters. This is compatible with the standard R
-#' convention used by \code{optim} and \code{compositional.mle}.
+#' convention used by \code{optim}.
 #'
 #' @param loglik A function taking a parameter vector (numeric or dual) and
 #'   returning a scalar. Parameters are accessed via \code{theta[i]}.
@@ -59,7 +61,7 @@ score <- function(loglik, theta) {
   for (i in seq_len(p)) {
     dual_theta <- .make_dual_vector(theta, i)
     result <- loglik(dual_theta)
-    grad[i] <- deriv(result)
+    grad[i] <- result@deriv
   }
 
   grad
@@ -89,7 +91,7 @@ hessian <- function(loglik, theta) {
     for (j in seq_len(i)) {
       dual_theta <- .make_dual2_vector(theta, i, j)
       result <- loglik(dual_theta)
-      H[i, j] <- deriv(deriv(result))
+      H[i, j] <- result@deriv@deriv
       H[j, i] <- H[i, j]
     }
   }
@@ -149,13 +151,15 @@ score_and_hessian <- function(score_fn, theta) {
     # Extract score values (only need to do this on the first pass)
     if (i == 1L) {
       for (k in seq_len(p)) {
-        s[k] <- value(result[[k]])
+        rk <- result[[k]]
+        s[k] <- if (is(rk, "dualr")) rk@value else rk
       }
     }
 
     # The Jacobian column i: d(score_k)/d(theta_i) for each k
     for (k in seq_len(p)) {
-      H[k, i] <- deriv(result[[k]])
+      rk <- result[[k]]
+      H[k, i] <- if (is(rk, "dualr")) rk@deriv else 0
     }
   }
 

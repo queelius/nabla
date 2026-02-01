@@ -2,13 +2,13 @@
 % Please edit documentation in R/dual-class.R
 \name{deriv}
 \alias{deriv}
-\alias{deriv,dual-method}
+\alias{deriv,dualr-method}
 \alias{deriv,numeric-method}
 \title{Extract the derivative (tangent) part of a dual number}
 \usage{
 deriv(d)
 
-\S4method{deriv}{dual}(d)
+\S4method{deriv}{dualr}(d)
 
 \S4method{deriv}{numeric}(d)
 }

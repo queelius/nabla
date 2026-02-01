@@ -2,10 +2,10 @@
 % Please edit documentation in R/dual-math.R
 \name{dual-log}
 \alias{dual-log}
-\alias{log,dual-method}
+\alias{log,dualr-method}
 \title{Logarithm with optional base for dual numbers}
 \usage{
-\S4method{log}{dual}(x, base = exp(1))
+\S4method{log}{dualr}(x, base = exp(1))
 }
 \arguments{
 \item{x}{A dual number.}

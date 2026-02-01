@@ -2,13 +2,13 @@
 % Please edit documentation in R/dual-math.R
 \name{dual-maxmin}
 \alias{dual-maxmin}
-\alias{max,dual-method}
-\alias{min,dual-method}
+\alias{max,dualr-method}
+\alias{min,dualr-method}
 \title{Piecewise max and min for dual numbers}
 \usage{
-\S4method{max}{dual}(x, ..., na.rm = FALSE)
+\S4method{max}{dualr}(x, ..., na.rm = FALSE)
 
-\S4method{min}{dual}(x, ..., na.rm = FALSE)
+\S4method{min}{dualr}(x, ..., na.rm = FALSE)
 }
 \arguments{
 \item{x}{A dual number.}

@@ -2,10 +2,10 @@
 % Please edit documentation in R/dual-math.R
 \name{dual-math2}
 \alias{dual-math2}
-\alias{Math2,dual-method}
+\alias{Math2,dualr-method}
 \title{Math2 group generic for dual numbers}
 \usage{
-\S4method{Math2}{dual}(x, digits)
+\S4method{Math2}{dualr}(x, digits)
 }
 \arguments{
 \item{x}{A \code{dual} number.}

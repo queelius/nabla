@@ -25,7 +25,7 @@
 #' result <- x^3
 #' second_deriv(result)  # 12 = 6*x at x=2
 dual2_variable <- function(x) {
-  dual(dual(x, 1), dual(1, 0))
+  .dual(.dual(x, 1), .dual(1, 0))
 }
 
 #' Create a second-order dual constant
@@ -39,7 +39,7 @@ dual2_variable <- function(x) {
 #' second_deriv(k^2)  # 0 (constant has no derivatives)
 #' @export
 dual2_constant <- function(x) {
-  dual(dual(x, 0), dual(0, 0))
+  .dual(.dual(x, 0), .dual(0, 0))
 }
 
 # -- Extraction helpers --------------------------------------------------------
@@ -55,7 +55,7 @@ dual2_constant <- function(x) {
 #' value2(result)  # 9
 #' @export
 value2 <- function(d) {
-  value(value(d))
+  d@value@value
 }
 
 #' Extract first derivative from a second-order dual
@@ -68,7 +68,7 @@ value2 <- function(d) {
 #' first_deriv(result)  # 6 (= 2*x at x=3)
 #' @export
 first_deriv <- function(d) {
-  deriv(value(d))
+  d@value@deriv
 }
 
 #' Extract second derivative from a second-order dual
@@ -81,7 +81,7 @@ first_deriv <- function(d) {
 #' second_deriv(result)  # 2
 #' @export
 second_deriv <- function(d) {
-  deriv(deriv(d))
+  d@deriv@deriv
 }
 
 # -- Convenience evaluator ----------------------------------------------------
@@ -104,8 +104,8 @@ second_deriv <- function(d) {
 differentiate2 <- function(f, x) {
   result <- f(dual2_variable(x))
   list(
-    value  = value2(result),
-    first  = first_deriv(result),
-    second = second_deriv(result)
+    value  = result@value@value,
+    first  = result@value@deriv,
+    second = result@deriv@deriv
   )
 }

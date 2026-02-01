@@ -3,20 +3,20 @@
 \name{beta}
 \alias{beta}
 \alias{beta,numeric,numeric-method}
-\alias{beta,dual,dual-method}
-\alias{beta,dual,numeric-method}
-\alias{beta,numeric,dual-method}
+\alias{beta,dualr,dualr-method}
+\alias{beta,dualr,numeric-method}
+\alias{beta,numeric,dualr-method}
 \title{Beta function for dual numbers}
 \usage{
 beta(a, b)
 
 \S4method{beta}{numeric,numeric}(a, b)
 
-\S4method{beta}{dual,dual}(a, b)
+\S4method{beta}{dualr,dualr}(a, b)
 
-\S4method{beta}{dual,numeric}(a, b)
+\S4method{beta}{dualr,numeric}(a, b)
 
-\S4method{beta}{numeric,dual}(a, b)
+\S4method{beta}{numeric,dualr}(a, b)
 }
 \arguments{
 \item{a}{A numeric or dual value.}

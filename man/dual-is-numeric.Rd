@@ -2,10 +2,10 @@
 % Please edit documentation in R/dual-class.R
 \name{dual-is-numeric}
 \alias{dual-is-numeric}
-\alias{is.numeric,dual-method}
+\alias{is.numeric,dualr-method}
 \title{Check if a dual number is numeric}
 \usage{
-\S4method{is.numeric}{dual}(x)
+\S4method{is.numeric}{dualr}(x)
 }
 \arguments{
 \item{x}{A \code{dual} object.}

@@ -2,16 +2,16 @@
 % Please edit documentation in R/dual-math.R
 \name{dual-atan2}
 \alias{dual-atan2}
-\alias{atan2,dual,dual-method}
-\alias{atan2,dual,numeric-method}
-\alias{atan2,numeric,dual-method}
+\alias{atan2,dualr,dualr-method}
+\alias{atan2,dualr,numeric-method}
+\alias{atan2,numeric,dualr-method}
 \title{Two-argument arctangent for dual numbers}
 \usage{
-\S4method{atan2}{dual,dual}(y, x)
+\S4method{atan2}{dualr,dualr}(y, x)
 
-\S4method{atan2}{dual,numeric}(y, x)
+\S4method{atan2}{dualr,numeric}(y, x)
 
-\S4method{atan2}{numeric,dual}(y, x)
+\S4method{atan2}{numeric,dualr}(y, x)
 }
 \arguments{
 \item{y}{A dual or numeric.}

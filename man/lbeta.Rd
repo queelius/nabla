@@ -3,20 +3,20 @@
 \name{lbeta}
 \alias{lbeta}
 \alias{lbeta,numeric,numeric-method}
-\alias{lbeta,dual,dual-method}
-\alias{lbeta,dual,numeric-method}
-\alias{lbeta,numeric,dual-method}
+\alias{lbeta,dualr,dualr-method}
+\alias{lbeta,dualr,numeric-method}
+\alias{lbeta,numeric,dualr-method}
 \title{Log-beta function for dual numbers}
 \usage{
 lbeta(a, b)
 
 \S4method{lbeta}{numeric,numeric}(a, b)
 
-\S4method{lbeta}{dual,dual}(a, b)
+\S4method{lbeta}{dualr,dualr}(a, b)
 
-\S4method{lbeta}{dual,numeric}(a, b)
+\S4method{lbeta}{dualr,numeric}(a, b)
 
-\S4method{lbeta}{numeric,dual}(a, b)
+\S4method{lbeta}{numeric,dualr}(a, b)
 }
 \arguments{
 \item{a}{A numeric or dual value.}

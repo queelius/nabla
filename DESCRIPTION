@@ -1,6 +1,6 @@
 Package: dualr
 Title: Forward-Mode Automatic Differentiation via Dual Numbers
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: person("Alexander", "Towell",
                    role = c("aut", "cre"),
                    email = "queelius@gmail.com",

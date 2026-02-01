@@ -2,10 +2,10 @@
 % Please edit documentation in R/dual-class.R
 \name{dual-combine}
 \alias{dual-combine}
-\alias{c,dual-method}
+\alias{c,dualr-method}
 \title{Combine dual numbers into a dual_vector}
 \usage{
-\S4method{c}{dual}(x, ..., recursive = FALSE)
+\S4method{c}{dualr}(x, ..., recursive = FALSE)
 }
 \arguments{
 \item{x}{A \code{dual} number.}

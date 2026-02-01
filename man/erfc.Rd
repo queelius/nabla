@@ -3,14 +3,14 @@
 \name{erfc}
 \alias{erfc}
 \alias{erfc,numeric-method}
-\alias{erfc,dual-method}
+\alias{erfc,dualr-method}
 \title{Complementary error function}
 \usage{
 erfc(x)
 
 \S4method{erfc}{numeric}(x)
 
-\S4method{erfc}{dual}(x)
+\S4method{erfc}{dualr}(x)
 }
 \arguments{
 \item{x}{A numeric or dual value.}

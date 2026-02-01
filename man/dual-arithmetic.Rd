@@ -2,25 +2,70 @@
 % Please edit documentation in R/dual-arithmetic.R
 \name{dual-arithmetic}
 \alias{dual-arithmetic}
-\alias{Ops,dual,dual-method}
-\alias{Ops,dual,numeric-method}
-\alias{Ops,numeric,dual-method}
-\alias{+,dual,missing-method}
-\alias{-,dual,missing-method}
-\alias{!,dual-method}
+\alias{Ops,dualr,dualr-method}
+\alias{Ops,dualr,numeric-method}
+\alias{Ops,numeric,dualr-method}
+\alias{+,dualr,dualr-method}
+\alias{+,dualr,numeric-method}
+\alias{+,numeric,dualr-method}
+\alias{-,dualr,dualr-method}
+\alias{-,dualr,numeric-method}
+\alias{-,numeric,dualr-method}
+\alias{*,dualr,dualr-method}
+\alias{*,dualr,numeric-method}
+\alias{*,numeric,dualr-method}
+\alias{/,dualr,dualr-method}
+\alias{/,dualr,numeric-method}
+\alias{/,numeric,dualr-method}
+\alias{^,dualr,dualr-method}
+\alias{^,dualr,numeric-method}
+\alias{^,numeric,dualr-method}
+\alias{+,dualr,missing-method}
+\alias{-,dualr,missing-method}
+\alias{!,dualr-method}
 \title{Arithmetic and comparison operators for dual numbers}
 \usage{
-\S4method{Ops}{dual,dual}(e1, e2)
+\S4method{+}{dualr,dualr}(e1, e2)
 
-\S4method{Ops}{dual,numeric}(e1, e2)
+\S4method{+}{dualr,numeric}(e1, e2)
 
-\S4method{Ops}{numeric,dual}(e1, e2)
+\S4method{+}{numeric,dualr}(e1, e2)
 
-\S4method{+}{dual,missing}(e1, e2)
+\S4method{-}{dualr,dualr}(e1, e2)
 
-\S4method{-}{dual,missing}(e1, e2)
+\S4method{-}{dualr,numeric}(e1, e2)
 
-\S4method{!}{dual}(x)
+\S4method{-}{numeric,dualr}(e1, e2)
+
+\S4method{*}{dualr,dualr}(e1, e2)
+
+\S4method{*}{dualr,numeric}(e1, e2)
+
+\S4method{*}{numeric,dualr}(e1, e2)
+
+\S4method{/}{dualr,dualr}(e1, e2)
+
+\S4method{/}{dualr,numeric}(e1, e2)
+
+\S4method{/}{numeric,dualr}(e1, e2)
+
+\S4method{^}{dualr,dualr}(e1, e2)
+
+\S4method{^}{dualr,numeric}(e1, e2)
+
+\S4method{^}{numeric,dualr}(e1, e2)
+
+\S4method{Ops}{dualr,dualr}(e1, e2)
+
+\S4method{Ops}{dualr,numeric}(e1, e2)
+
+\S4method{Ops}{numeric,dualr}(e1, e2)
+
+\S4method{+}{dualr,missing}(e1, e2)
+
+\S4method{-}{dualr,missing}(e1, e2)
+
+\S4method{!}{dualr}(x)
 }
 \arguments{
 \item{e1, e2}{Dual or numeric operands.}
@@ -31,8 +76,7 @@
 A \code{dual} for arithmetic ops; logical for comparisons.
 }
 \description{
-Implements the \code{Ops} group generic for dual numbers, supporting
-arithmetic (\code{+}, \code{-}, \code{*}, \code{/}, \code{^}),
+Implements arithmetic (\code{+}, \code{-}, \code{*}, \code{/}, \code{^}),
 comparison (\code{==}, \code{!=}, \code{<}, \code{>}, \code{<=}, \code{>=}),
 and logical (\code{&}, \code{|}) operators. Derivatives follow standard
 calculus rules (sum, product, quotient, power, chain).

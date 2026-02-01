@@ -2,10 +2,10 @@
 % Please edit documentation in R/dual-arithmetic.R
 \name{dual-summary}
 \alias{dual-summary}
-\alias{Summary,dual-method}
+\alias{Summary,dualr-method}
 \title{Summary group generic for dual numbers}
 \usage{
-\S4method{Summary}{dual}(x, ..., na.rm = FALSE)
+\S4method{Summary}{dualr}(x, ..., na.rm = FALSE)
 }
 \arguments{
 \item{x}{A dual number.}

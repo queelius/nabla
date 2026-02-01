@@ -8,8 +8,12 @@
 #'   or another dual for higher-order.
 #' @slot deriv The tangent (derivative) component. Numeric for first-order
 #'   duals, or another dual for higher-order.
-#' @exportClass dual
-setClass("dual", slots = list(value = "ANY", deriv = "ANY"))
+#' @exportClass dualr
+setClass("dualr", slots = list(value = "ANY", deriv = "ANY"))
+
+# -- Internal fast constructor (bypasses dual() wrapper) ----------------------
+
+.dual <- function(value, deriv) new("dualr", value = value, deriv = deriv)
 
 # -- Constructors --------------------------------------------------------------
 
@@ -25,7 +29,7 @@ setClass("dual", slots = list(value = "ANY", deriv = "ANY"))
 #' value(x)  # 3
 #' deriv(x)  # 1
 dual <- function(value, deriv = 0) {
-  new("dual", value = value, deriv = deriv)
+  new("dualr", value = value, deriv = deriv)
 }
 
 #' Create a dual variable (derivative seed = 1)
@@ -41,7 +45,7 @@ dual <- function(value, deriv = 0) {
 #' x <- dual_variable(2)
 #' deriv(x^2)  # 4 = 2*x evaluated at x=2
 dual_variable <- function(x) {
-  dual(x, 1)
+  .dual(x, 1)
 }
 
 #' Create a dual constant (derivative seed = 0)
@@ -56,7 +60,7 @@ dual_variable <- function(x) {
 #' k <- dual_constant(5)
 #' deriv(k)  # 0
 dual_constant <- function(x) {
-  dual(x, 0)
+  .dual(x, 0)
 }
 
 # -- Generics and accessors ----------------------------------------------------
@@ -72,7 +76,7 @@ setGeneric("value", function(d) standardGeneric("value"))
 
 #' @rdname value
 #' @export
-setMethod("value", "dual", function(d) d@value)
+setMethod("value", "dualr", function(d) d@value)
 
 #' @rdname value
 #' @export
@@ -89,7 +93,7 @@ setGeneric("deriv", function(d) standardGeneric("deriv"))
 
 #' @rdname deriv
 #' @export
-setMethod("deriv", "dual", function(d) d@deriv)
+setMethod("deriv", "dualr", function(d) d@deriv)
 
 #' @rdname deriv
 #' @export
@@ -109,14 +113,14 @@ setMethod("deriv", "numeric", function(d) 0)
 #' dv  # prints: <dual_vector: 2 elements>
 #'
 #' @name dual-show
-#' @aliases show,dual-method show,dual_vector-method
+#' @aliases show,dualr-method show,dual_vector-method
 NULL
 
 #' @rdname dual-show
 #' @export
-setMethod("show", "dual", function(object) {
-  v <- format(value(object))
-  d <- format(deriv(object))
+setMethod("show", "dualr", function(object) {
+  v <- format(object@value)
+  d <- format(object@deriv)
   cat(sprintf("<dual: %s + %s*e>\n", v, d))
 })
 
@@ -134,13 +138,13 @@ setMethod("show", "dual", function(object) {
 #' as.numeric(x)  # 3.14
 #'
 #' @name dual-coerce
-#' @aliases as.numeric,dual-method
+#' @aliases as.numeric,dualr-method
 NULL
 
 #' @rdname dual-coerce
 #' @export
-setMethod("as.numeric", "dual", function(x, ...) {
-  as.numeric(value(x))
+setMethod("as.numeric", "dualr", function(x, ...) {
+  as.numeric(x@value)
 })
 
 # -- Predicate -----------------------------------------------------------------
@@ -154,7 +158,7 @@ setMethod("as.numeric", "dual", function(x, ...) {
 #' is_dual(42)           # FALSE
 #' @export
 is_dual <- function(x) {
-  is(x, "dual")
+  is(x, "dualr")
 }
 
 # -- is.numeric: return TRUE so defensive checks pass -------------------------
@@ -169,12 +173,12 @@ is_dual <- function(x) {
 #' is.numeric(dual(1, 0))  # TRUE
 #'
 #' @name dual-is-numeric
-#' @aliases is.numeric,dual-method
+#' @aliases is.numeric,dualr-method
 NULL
 
 #' @rdname dual-is-numeric
 #' @export
-setMethod("is.numeric", "dual", function(x) TRUE)
+setMethod("is.numeric", "dualr", function(x) TRUE)
 
 # -- c() method: collect duals into a dual_vector -----------------------------
 
@@ -191,12 +195,12 @@ setMethod("is.numeric", "dual", function(x) TRUE)
 #' length(dv)  # 2
 #'
 #' @name dual-combine
-#' @aliases c,dual-method
+#' @aliases c,dualr-method
 NULL
 
 #' @rdname dual-combine
 #' @export
-setMethod("c", "dual", function(x, ..., recursive = FALSE) {
+setMethod("c", "dualr", function(x, ..., recursive = FALSE) {
   args <- list(x, ...)
   args <- lapply(args, .as_dual)
   dual_vector(args)
@@ -205,8 +209,13 @@ setMethod("c", "dual", function(x, ..., recursive = FALSE) {
 # -- Internal helper: promote numeric to dual constant -------------------------
 
 .as_dual <- function(x) {
-  if (is(x, "dual")) x else dual(x, 0)
+  if (is(x, "dualr")) x else .dual(x, 0)
 }
+
+# -- Internal helpers: pairwise min/max for Reduce() ---------------------------
+
+.dual_min <- function(a, b) if (a@value <= b@value) a else b
+.dual_max <- function(a, b) if (a@value >= b@value) a else b
 
 # -- Dual vector: a list-like container for multiple dual numbers ---------------
 
@@ -233,7 +242,7 @@ setClass("dual_vector", contains = "list")
 #' value(dv[1])  # 1
 dual_vector <- function(...) {
   args <- list(...)
-  if (length(args) == 1L && is.list(args[[1L]]) && !is(args[[1L]], "dual")) {
+  if (length(args) == 1L && is.list(args[[1L]]) && !is(args[[1L]], "dualr")) {
     args <- args[[1L]]
   }
   new("dual_vector", args)

@@ -3,14 +3,14 @@
 \name{erf}
 \alias{erf}
 \alias{erf,numeric-method}
-\alias{erf,dual-method}
+\alias{erf,dualr-method}
 \title{Error function}
 \usage{
 erf(x)
 
 \S4method{erf}{numeric}(x)
 
-\S4method{erf}{dual}(x)
+\S4method{erf}{dualr}(x)
 }
 \arguments{
 \item{x}{A numeric or dual value.}

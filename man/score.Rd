@@ -22,7 +22,7 @@ AD. Runs \code{p} forward passes, one per parameter.
 \details{
 The log-likelihood function should use \code{theta[1]}, \code{theta[2]},
 etc. to access parameters. This is compatible with the standard R
-convention used by \code{optim} and \code{compositional.mle}.
+convention used by \code{optim}.
 }
 \examples{
 # Normal log-likelihood for mu
