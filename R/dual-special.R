@@ -1,6 +1,4 @@
-# Special mathematical functions for dual numbers
-#
-# Functions not covered by the Math or Ops group generics.
+# Special mathematical functions (not covered by Math or Ops group generics)
 
 # -- Error functions -----------------------------------------------------------
 
@@ -115,6 +113,7 @@ setMethod("lbeta", signature(a = "numeric", b = "dualr"), function(a, b) {
 #' @param a A numeric or dual value.
 #' @param b A numeric or dual value.
 #' @return \code{beta(a, b)} with derivative.
+#' @aliases beta,ANY,ANY-method
 #' @examples
 #' beta(2, 3)  # 1/12
 #' a <- dual_variable(2)
@@ -130,19 +129,7 @@ setMethod("beta", signature(a = "numeric", b = "numeric"), function(a, b) {
 
 #' @rdname beta
 #' @export
-setMethod("beta", signature(a = "dualr", b = "dualr"), function(a, b) {
-  exp(lbeta(a, b))
-})
-
-#' @rdname beta
-#' @export
-setMethod("beta", signature(a = "dualr", b = "numeric"), function(a, b) {
-  exp(lbeta(a, b))
-})
-
-#' @rdname beta
-#' @export
-setMethod("beta", signature(a = "numeric", b = "dualr"), function(a, b) {
+setMethod("beta", signature(a = "ANY", b = "ANY"), function(a, b) {
   exp(lbeta(a, b))
 })
 

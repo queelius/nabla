@@ -27,7 +27,7 @@
 #' @aliases Ops,dualr,dualr-method Ops,dualr,numeric-method Ops,numeric,dualr-method
 NULL
 
-# -- Internal helper: recursive zero check for nested duals ------------------
+# -- Internal helper -----------------------------------------------------------
 
 .is_zero <- function(x) {
   if (identical(x, 0)) return(TRUE)
@@ -163,26 +163,24 @@ setMethod("^", signature(e1 = "numeric", e2 = "dualr"), function(e1, e2) {
 # Handles: %%, %/%, ==, !=, <, >, <=, >=, &, |
 # =============================================================================
 
+.ops_value_only <- function(v1, v2, generic) {
+  switch(generic,
+    "==" = v1 == v2, "!=" = v1 != v2,
+    "<"  = v1 <  v2, ">"  = v1 >  v2,
+    "<=" = v1 <= v2, ">=" = v1 >= v2,
+    "&"  = v1 &  v2, "|"  = v1 |  v2,
+    NULL
+  )
+}
+
 #' @rdname dual-arithmetic
 #' @export
 setMethod("Ops", signature(e1 = "dualr", e2 = "dualr"), function(e1, e2) {
-  v1 <- e1@value; d1 <- e1@deriv
-  v2 <- e2@value; d2 <- e2@deriv
-
+  r <- .ops_value_only(e1@value, e2@value, .Generic)
+  if (!is.null(r)) return(r)
   switch(.Generic,
-    "%%" = .dual(v1 %% v2, d1),
-    "%/%" = .dual(v1 %/% v2, 0),
-
-    "==" = v1 == v2,
-    "!=" = v1 != v2,
-    "<"  = v1 <  v2,
-    ">"  = v1 >  v2,
-    "<=" = v1 <= v2,
-    ">=" = v1 >= v2,
-
-    "&" = v1 & v2,
-    "|" = v1 | v2,
-
+    "%%"  = .dual(e1@value %% e2@value, e1@deriv),
+    "%/%" = .dual(e1@value %/% e2@value, 0),
     stop(sprintf("operator '%s' not implemented for dual numbers", .Generic))
   )
 })
@@ -190,22 +188,11 @@ setMethod("Ops", signature(e1 = "dualr", e2 = "dualr"), function(e1, e2) {
 #' @rdname dual-arithmetic
 #' @export
 setMethod("Ops", signature(e1 = "dualr", e2 = "numeric"), function(e1, e2) {
-  v1 <- e1@value
-
+  r <- .ops_value_only(e1@value, e2, .Generic)
+  if (!is.null(r)) return(r)
   switch(.Generic,
-    "%%" = .dual(v1 %% e2, e1@deriv),
-    "%/%" = .dual(v1 %/% e2, 0),
-
-    "==" = v1 == e2,
-    "!=" = v1 != e2,
-    "<"  = v1 <  e2,
-    ">"  = v1 >  e2,
-    "<=" = v1 <= e2,
-    ">=" = v1 >= e2,
-
-    "&" = v1 & e2,
-    "|" = v1 | e2,
-
+    "%%"  = .dual(e1@value %% e2, e1@deriv),
+    "%/%" = .dual(e1@value %/% e2, 0),
     stop(sprintf("operator '%s' not implemented for dual numbers", .Generic))
   )
 })
@@ -213,22 +200,11 @@ setMethod("Ops", signature(e1 = "dualr", e2 = "numeric"), function(e1, e2) {
 #' @rdname dual-arithmetic
 #' @export
 setMethod("Ops", signature(e1 = "numeric", e2 = "dualr"), function(e1, e2) {
-  v2 <- e2@value
-
+  r <- .ops_value_only(e1, e2@value, .Generic)
+  if (!is.null(r)) return(r)
   switch(.Generic,
-    "%%" = .dual(e1 %% v2, 0),
-    "%/%" = .dual(e1 %/% v2, 0),
-
-    "==" = e1 == v2,
-    "!=" = e1 != v2,
-    "<"  = e1 <  v2,
-    ">"  = e1 >  v2,
-    "<=" = e1 <= v2,
-    ">=" = e1 >= v2,
-
-    "&" = e1 & v2,
-    "|" = e1 | v2,
-
+    "%%"  = .dual(e1 %% e2@value, 0),
+    "%/%" = .dual(e1 %/% e2@value, 0),
     stop(sprintf("operator '%s' not implemented for dual numbers", .Generic))
   )
 })

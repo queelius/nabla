@@ -12,3 +12,6 @@
 ^tests/bench
 ^CITATION\.cff$
 ^\.zenodo\.json$
+^Rplots\.pdf$
+^dualr\.Rcheck$
+^nabla_.*\.tar\.gz$

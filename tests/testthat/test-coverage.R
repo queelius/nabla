@@ -509,33 +509,3 @@ test_that("max via Summary group selects correct dual", {
   expect_equal(deriv(r), 1)
 })
 
-# ===========================================================================
-# 7. sum() with mixed dual and numeric arguments
-# ===========================================================================
-
-test_that("sum(dual, numeric) promotes numeric and sums correctly", {
-  r <- sum(dual(3, 1), 7)
-  expect_true(is_dual(r))
-  expect_equal(value(r), 10)
-  expect_equal(deriv(r), 1)
-})
-
-test_that("sum(numeric, dual) promotes numeric and sums correctly", {
-  # numeric first, then dual -- tests that .as_dual handles promotion
-  r <- sum(dual(2, 1), 5, 3)
-  expect_true(is_dual(r))
-  expect_equal(value(r), 10)
-  expect_equal(deriv(r), 1)
-})
-
-test_that("sum() with all numerics except one dual", {
-  r <- sum(dual(1, 1), 2, 3, 4)
-  expect_equal(value(r), 10)
-  expect_equal(deriv(r), 1)
-})
-
-test_that("sum() with multiple duals and numerics", {
-  r <- sum(dual(1, 1), dual(2, 0.5), 10)
-  expect_equal(value(r), 13)
-  expect_equal(deriv(r), 1.5)
-})

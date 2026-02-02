@@ -15,8 +15,8 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(nabla)
 ```
 
-This vignette demonstrates `nabla`'s `gradient()` and `hessian()` functions
-on several functions. For each, we compare derivatives computed three ways:
+This vignette demonstrates `gradient()` and `hessian()` on several
+statistical models, comparing derivatives computed three ways:
 
 1. **Analytical** — hand-derived formulas
 2. **Finite differences** — numerical approximation
@@ -24,7 +24,7 @@ on several functions. For each, we compare derivatives computed three ways:
 
 ## Helper: finite difference utilities
 
-We'll use central differences for numerical comparison:
+Central differences serve as the numerical baseline:
 
 ```{r}
 numerical_gradient <- function(f, x, h = 1e-7) {
@@ -59,8 +59,8 @@ numerical_hessian <- function(f, x, h = 1e-5) {
 
 ## Normal log-likelihood: known sigma, unknown mu
 
-A simple starting example. Given data $x_1, \ldots, x_n$ with known $\sigma$,
-the log-likelihood for $\mu$ is:
+Given data $x_1, \ldots, x_n$ with known $\sigma$, the log-likelihood
+for $\mu$ is:
 
 $$\ell(\mu) = -\frac{1}{2\sigma^2} \sum_{i=1}^n (x_i - \mu)^2 + \text{const}$$
 
@@ -108,11 +108,16 @@ data.frame(
 )
 ```
 
-All three methods agree to machine precision for this simple quadratic
-function. The gradient is linear in $\mu$ and the Hessian is constant
-($-n/\sigma^2 = -25$), so there are no higher-order terms for finite
-differences to approximate poorly. This serves as a sanity check
-that the AD machinery is wired correctly.
+All three methods agree to machine precision for this quadratic function.
+The gradient is linear in $\mu$ and the Hessian is constant
+($-n/\sigma^2 = -25$), so finite differences have no higher-order terms
+to approximate poorly. This confirms the AD machinery is wired correctly.
+
+But the real payoff of exact Hessians is not the MLE itself — any
+optimizer can find that. It's the **observed information matrix**
+$J(\hat\theta) = -H(\hat\theta)$, whose inverse gives the asymptotic
+variance-covariance matrix. Inaccurate Hessians mean inaccurate standard
+errors and confidence intervals.
 
 The observed information (negative Hessian) is simply:
 
@@ -123,7 +128,7 @@ obs_info  # should equal n/sigma^2 = 25
 
 ## Normal log-likelihood: unknown mu and sigma
 
-Now both $\mu$ and $\sigma$ are unknown. The log-likelihood is:
+With both $\mu$ and $\sigma$ unknown, the log-likelihood is:
 
 $$\ell(\mu, \sigma) = -n \log(\sigma) - \frac{1}{2\sigma^2}\sum(x_i - \mu)^2$$
 
@@ -185,8 +190,8 @@ The maximum absolute difference between the AD and analytical Hessians is
 at the level of machine epsilon ($\sim 10^{-14}$), confirming that AD
 computes exact second derivatives even for this two-parameter model. The
 cross-derivative $\partial^2 \ell / \partial\mu\,\partial\sigma$ is non-zero
-when $\mu \ne \bar{x}$, exercising the mixed-partial logic in nested dual
-arithmetic.
+when $\mu \ne \bar{x}$, confirming that AD correctly propagates through the
+cross-derivative $\partial^2 \ell / \partial\mu\,\partial\sigma$.
 
 ## Poisson log-likelihood: unknown lambda
 
@@ -228,15 +233,15 @@ data.frame(
 )
 ```
 
-Again, all three methods agree exactly. The Poisson log-likelihood involves
-only `log(lambda)` and linear terms in $\lambda$, so the sufficient
-statistics produce clean rational expressions for the gradient and Hessian —
-making this an ideal test case for verifying AD correctness.
+All three methods agree exactly. The Poisson log-likelihood involves only
+`log(lambda)` and linear terms in $\lambda$, producing clean rational
+expressions for the gradient and Hessian — an ideal test case for
+verifying AD correctness.
 
 ### Visualizing the gradient
 
-The gradient of a function is zero at its optimum. We can see this
-by plotting the log-likelihood and its gradient together:
+The gradient is zero at the optimum. Plotting the log-likelihood and
+its gradient together confirms this:
 
 ```{r fig-poisson-gradient, fig.width=6, fig.height=4}
 lam_grid <- seq(2.0, 5.5, length.out = 200)
@@ -277,7 +282,8 @@ log-likelihood:
 
 $$\ell(\alpha) = (\alpha - 1)\sum \log x_i - n\log\Gamma(\alpha) + n\alpha\log(\beta) - \beta\sum x_i$$
 
-This is interesting because it involves `lgamma` and `digamma`.
+This model exercises `lgamma` and `digamma` — special functions that AD
+handles exactly.
 
 ```{r}
 set.seed(99)
@@ -316,14 +322,13 @@ data.frame(
 )
 ```
 
-The Gamma model is a key differentiator between AD and finite differences.
-The log-likelihood involves `lgamma(alpha)`, whose derivatives are
-`digamma` and `trigamma` — special functions that `nabla` propagates
-exactly through the chain rule. With finite differences, choosing a good
-step size $h$ for `lgamma` is tricky: too large introduces truncation
-error in the rapidly-varying digamma function, too small amplifies
-round-off. AD sidesteps this entirely by computing the exact `digamma`
-and `trigamma` values at each evaluation point.
+The Gamma model is where AD and finite differences diverge. The
+log-likelihood involves `lgamma(alpha)`, whose derivatives are `digamma`
+and `trigamma` — special functions that `nabla` propagates exactly via the
+chain rule. With finite differences, choosing a good step size $h$ for
+`lgamma` is difficult: too large introduces truncation error in the
+rapidly-varying digamma, too small amplifies round-off. AD sidesteps
+this by computing exact `digamma` and `trigamma` values at each point.
 
 ## Logistic regression: 2 predictors
 
@@ -343,7 +348,7 @@ prob_true <- 1 / (1 + exp(-eta_true))
 y <- rbinom(n_lr, 1, prob_true)
 
 ll_logistic <- function(x) {
-  result <- dual_constant(0)
+  result <- 0
   for (i in seq_len(n_lr)) {
     eta_i <- x[1] * X[i, 1] + x[2] * X[i, 2] + x[3] * X[i, 3]
     result <- result + y[i] * eta_i - log(1 + exp(eta_i))
@@ -378,15 +383,15 @@ cat("Max |AD - numerical| in Hessian:", max(abs(ad_hess_lr - num_hess_lr)), "\n"
 ```
 
 The numerical Hessian difference ($\sim 10^{-5}$) is noticeably larger than
-in the earlier models. This is because the logistic log-likelihood is
-computed via a loop over $n = 50$ observations, and each finite-difference
-perturbation accumulates small errors across all iterations. AD remains
-exact regardless of the number of loop iterations — each arithmetic
-operation propagates derivatives without approximation.
+in earlier models. The logistic log-likelihood is computed via a loop over
+$n = 50$ observations, and each finite-difference perturbation accumulates
+small errors across all iterations. AD remains exact regardless of loop
+length — each arithmetic operation propagates derivatives without
+approximation.
 
 ## Newton-Raphson optimizer
 
-We can build a simple optimizer using `gradient()` and `hessian()` directly.
+A simple optimizer built directly on `gradient()` and `hessian()`.
 Newton-Raphson updates: $\theta_{k+1} = \theta_k - H^{-1} g$ where $g$ is
 the gradient and $H$ is the Hessian.
 
@@ -418,8 +423,7 @@ cat("Max difference:", max(abs(result_nr$estimate - c(mle_mu, mle_sigma))), "\n"
 
 ### Contour plot: Normal(mu, sigma) log-likelihood surface
 
-The two-parameter Normal model has a log-likelihood surface we can visualize
-with contours. The MLE sits at the peak:
+The two-parameter Normal log-likelihood surface, with the MLE at the peak:
 
 ```{r fig-normal-contour, fig.width=6, fig.height=5}
 mu_grid <- seq(4.0, 6.0, length.out = 80)
@@ -441,9 +445,7 @@ text(mle_mu + 0.15, mle_sigma, "MLE", col = "firebrick", cex = 0.9)
 
 ### Newton-Raphson convergence path
 
-We can visualize how Newton-Raphson converges to the MLE by recording
-the parameter estimates at each iteration and overlaying them on the
-contour plot:
+Parameter estimates at each iteration overlaid on the contour plot:
 
 ```{r fig-nr-path, fig.width=6, fig.height=5}
 # Newton-Raphson with trace
@@ -480,9 +482,9 @@ legend("topright",
        bty = "n")
 ```
 
-Newton-Raphson converges in `r result_trace$iterations` iterations — fast
-quadratic convergence is a hallmark of having exact gradient and Hessian
-information from AD.
+Newton-Raphson converges in `r result_trace$iterations` iterations — the
+fast quadratic convergence that exact gradient and Hessian information
+enables.
 
 ## `jacobian()`: differentiating a vector-valued function
 
@@ -526,3 +528,7 @@ Across five models of increasing complexity, several patterns emerge:
 - **Newton-Raphson with AD gradients converges in few iterations.** The
   exact Hessian provides the quadratic convergence that Newton's method
   promises in theory — no line search or quasi-Newton approximation needed.
+- **Exact Hessians yield exact standard errors.** The observed information
+  matrix $J(\hat\theta) = -H(\hat\theta)$ is the foundation of asymptotic
+  confidence intervals. Finite-difference errors in the Hessian propagate
+  directly into CI widths; AD eliminates this source of inaccuracy.

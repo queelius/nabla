@@ -15,78 +15,24 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(nabla)
 ```
 
-## Nested duals
-
-First-order duals give us $f(x)$ and $f'(x)$. To also get $f''(x)$, `nabla`
-uses **nested duals** — a dual number whose components are themselves dual
-numbers.
-
-The structure `dual(dual(x, 1), dual(1, 0))` simultaneously tracks:
-
-- $f(x)$ — the value of the inner value
-- $f'(x)$ — the derivative of the inner value
-- $f''(x)$ — the derivative of the outer derivative
-
-```{r}
-x <- dual_variable_n(2, order = 2)
-
-# Evaluate x^3
-result <- x^3
-
-# Extract all three quantities
-deriv_n(result, 0)  # f(2) = 8
-deriv_n(result, 1)  # f'(2) = 3*4 = 12
-deriv_n(result, 2)  # f''(2) = 6*2 = 12
-```
-
-For constants in higher-order computations, use `dual_constant_n()`:
-
-```{r}
-k <- dual_constant_n(5, order = 2)
-deriv_n(k, 0)  # 5
-deriv_n(k, 1)  # 0
-deriv_n(k, 2)  # 0
-```
-
-## The `differentiate_n()` helper
-
-For quick evaluation, `differentiate_n()` wraps the construction and extraction:
-
-```{r}
-# Differentiate sin(x) at x = pi/4
-result <- differentiate_n(sin, pi / 4, order = 2)
-result$value   # sin(pi/4)
-result$d1      # cos(pi/4) = f'
-result$d2      # -sin(pi/4) = f''
-```
-
-Verify against known values:
-
-```{r}
-result$value - sin(pi / 4)     # ~0
-result$d1 - cos(pi / 4)        # ~0
-result$d2 - (-sin(pi / 4))     # ~0
-```
-
-More complex functions work too:
-
-```{r}
-f <- function(x) x * exp(-x^2)
-d2 <- differentiate_n(f, 1, order = 2)
-
-# Analytical: f'(x) = exp(-x^2)(1 - 2x^2)
-# f''(x) = exp(-x^2)(-6x + 4x^3)
-analytical_f1 <- exp(-1) * (1 - 2)
-analytical_f2 <- exp(-1) * (-6 + 4)
-d2$d1 - analytical_f1   # ~0
-d2$d2 - analytical_f2   # ~0
-```
-
 ## The `D` operator
 
-The `D` operator provides a composable way to compute derivatives of
-multi-parameter functions. `D(f)` returns the derivative of `f` as a new
-function, and compositions `D(D(f))` yield higher-order derivative tensors:
+The `D` operator composes to arbitrary order. `D(f, x)` gives the first
+derivative; `D(f, x, order = 2)` gives the second; `D(f, x, order = 3)`
+gives the third-order tensor; and so on:
+
+```{r}
+f <- function(x) x[1]^3
+
+D(f, 2)                # f'(2) = 3*4 = 12
+D(f, 2, order = 2)     # f''(2) = 6*2 = 12
+D(f, 2, order = 3)     # f'''(2) = 6
+```
+
+For multi-parameter functions, each application of `D` appends one dimension
+to the output. A scalar function $f: \mathbb{R}^n \to \mathbb{R}$ produces
+a gradient vector ($n$), then a Hessian matrix ($n \times n$), then a
+third-order tensor ($n \times n \times n$):
 
 ```{r}
 # Gradient of a 2-parameter function
@@ -124,31 +70,34 @@ The curvature of a curve $y = f(x)$ is:
 
 $$\kappa = \frac{|f''(x)|}{(1 + f'(x)^2)^{3/2}}$$
 
-With second-order AD, we can compute this directly:
+With `D()`, we can compute this directly:
 
 ```{r}
 curvature <- function(f, x) {
-  d2 <- differentiate_n(f, x, order = 2)
-  abs(d2$d2) / (1 + d2$d1^2)^(3/2)
+  d1 <- D(f, x)
+  d2 <- D(f, x, order = 2)
+  abs(d2) / (1 + d1^2)^(3/2)
 }
 
 # Curvature of sin(x) at various points
+# Wrap sin for D()'s x[1] convention
+sin_f <- function(x) sin(x[1])
 xs <- seq(0, 2 * pi, length.out = 7)
-kappas <- sapply(xs, function(x) curvature(sin, x))
+kappas <- sapply(xs, function(x) curvature(sin_f, x))
 data.frame(x = round(xs, 3), curvature = round(kappas, 6))
 ```
 
-The pattern in the table reveals the geometry of $\sin(x)$: curvature is
-zero at the inflection points (integer multiples of $\pi$, where
-$\sin''(x) = 0$), and peaks at $\pi/2$ and $3\pi/2$ where $\sin$ reaches
-its extreme values. The maximum curvature of 1.0 occurs because $\sin$ has
-unit amplitude — for $A\sin(x)$ the maximum curvature would be $A$.
+The table reveals the geometry of $\sin(x)$: curvature is zero at
+inflection points (integer multiples of $\pi$, where $\sin''(x) = 0$) and
+peaks at $\pi/2$ and $3\pi/2$ where $\sin$ reaches its extrema. The
+maximum curvature of 1.0 reflects the unit amplitude — for $A\sin(x)$ the
+maximum curvature would be $A$.
 
 At $x = \pi/2$, $\sin$ has maximum curvature because $|\sin''(\pi/2)| = 1$
 and $\sin'(\pi/2) = 0$:
 
 ```{r}
-curvature(sin, pi / 2)  # should be 1.0
+curvature(sin_f, pi / 2)  # should be 1.0
 ```
 
 ### Visualizing curvature along sin(x)
@@ -159,7 +108,7 @@ first derivative is small. For $\sin(x)$, this occurs at $\pi/2$ and $3\pi/2$:
 ```{r fig-sin-curvature, fig.width=6, fig.height=4}
 xs_curve <- seq(0, 2 * pi, length.out = 200)
 sin_vals <- sin(xs_curve)
-kappa_vals <- sapply(xs_curve, function(x) curvature(sin, x))
+kappa_vals <- sapply(xs_curve, function(x) curvature(sin_f, x))
 
 par(mar = c(4, 4.5, 2, 4.5))
 plot(xs_curve, sin_vals, type = "l", col = "steelblue", lwd = 2,
@@ -187,16 +136,18 @@ A second-order Taylor approximation of $f$ around $x_0$:
 
 $$f(x) \approx f(x_0) + f'(x_0)(x - x_0) + \frac{1}{2} f''(x_0)(x - x_0)^2$$
 
-We can compute this using nested duals:
+`D()` computes this directly:
 
 ```{r}
 taylor2 <- function(f, x0, x) {
-  d2 <- differentiate_n(f, x0, order = 2)
-  d2$value + d2$d1 * (x - x0) + 0.5 * d2$d2 * (x - x0)^2
+  f0 <- f(x0)
+  f1 <- D(f, x0)
+  f2 <- D(f, x0, order = 2)
+  f0 + f1 * (x - x0) + 0.5 * f2 * (x - x0)^2
 }
 
 # Approximate exp(x) near x = 0
-f_exp <- function(x) exp(x)
+f_exp <- function(x) exp(x[1])
 xs <- c(-0.1, -0.01, 0, 0.01, 0.1)
 data.frame(
   x = xs,
@@ -206,14 +157,13 @@ data.frame(
 )
 ```
 
-Near the expansion point, the approximation is very accurate. The error
-grows as $O(|x - x_0|^3)$ because the Taylor remainder is
+Near the expansion point, the approximation is accurate. The error grows
+as $O(|x - x_0|^3)$ because the Taylor remainder is
 $\frac{f'''(\xi)}{6}(x - x_0)^3$. For $\exp(x)$ around $x_0 = 0$,
 $f'''(\xi) = \exp(\xi) \approx 1$, so the error at $x = 0.1$ is
 approximately $0.1^3/6 \approx 1.7 \times 10^{-4}$ and at $x = 0.01$ it
 drops to $\approx 1.7 \times 10^{-7}$ — a factor-of-1000 reduction for a
-factor-of-10 decrease in distance, confirming cubic convergence. We can see
-this divergence visually:
+factor-of-10 decrease in distance, confirming cubic convergence:
 
 ```{r fig-taylor-vs-exact, fig.width=6, fig.height=4}
 xs_plot <- seq(-2, 3, length.out = 300)
@@ -237,11 +187,14 @@ legend("topleft",
 The Taylor polynomial matches `exp(x)` closely near $x_0 = 0$ but diverges
 at larger distances, illustrating the local nature of polynomial approximation.
 
-## Connection to MLE: Hessian via nested duals
+## Connection to MLE: exact Hessians for standard errors
 
-The `hessian()` function in `nabla` uses the `D` operator internally. We can
-verify this by manually constructing a second-order dual for a log-likelihood
-and comparing with the `hessian()` helper.
+`hessian()` computes the exact second-derivative matrix at any point. For
+maximum likelihood estimation, this gives the **observed information matrix**
+$J(\hat\theta) = -H(\hat\theta)$, whose inverse is the asymptotic
+variance-covariance matrix. Exact Hessians yield exact standard errors and
+confidence intervals — the primary reason to use AD in statistical
+inference.
 
 Consider a Poisson log-likelihood for $\lambda$:
 
@@ -260,14 +213,23 @@ ll_poisson <- function(theta) {
 lambda0 <- 2.5
 ```
 
-**Method 1**: Using `hessian()` helper:
+**Primary approach**: Using `hessian()`:
 
 ```{r}
 hess_helper <- hessian(ll_poisson, lambda0)
 hess_helper
 ```
 
-**Method 2**: Manual nested dual construction:
+The observed information is simply `-hess_helper`, and the standard error
+is `1 / sqrt(-hess_helper)`:
+
+```{r}
+se <- 1 / sqrt(-hess_helper[1, 1])
+cat("SE(lambda) at lambda =", lambda0, ":", se, "\n")
+```
+
+**Verification**: Manual construction of a second-order dual number — the
+same arithmetic that `hessian()` performs internally:
 
 ```{r}
 # Build a dual_variable_n wrapped in a dual_vector
@@ -283,23 +245,91 @@ Both approaches yield the same result:
 hess_helper[1, 1] - manual_hess  # ~0
 ```
 
-This shows that `hessian()` is simply an organized wrapper around the same
-nested dual arithmetic.
+## How it works: nested duals
+
+Under the hood, `D(f, x, order = 2)` uses **nested duals** — a dual number
+whose components are themselves dual numbers. The structure
+`dual(dual(x, 1), dual(1, 0))` simultaneously tracks:
+
+- $f(x)$ — the value of the inner value
+- $f'(x)$ — the derivative of the inner value
+- $f''(x)$ — the derivative of the outer derivative
+
+Nested duals can be constructed directly with `dual_variable_n()`:
+
+```{r}
+x <- dual_variable_n(2, order = 2)
+
+# Evaluate x^3
+result <- x^3
+
+# Extract all three quantities
+deriv_n(result, 0)  # f(2) = 8
+deriv_n(result, 1)  # f'(2) = 3*4 = 12
+deriv_n(result, 2)  # f''(2) = 6*2 = 12
+```
+
+For constants in higher-order computations, use `dual_constant_n()`:
+
+```{r}
+k <- dual_constant_n(5, order = 2)
+deriv_n(k, 0)  # 5
+deriv_n(k, 1)  # 0
+deriv_n(k, 2)  # 0
+```
+
+The `differentiate_n()` helper wraps the construction and extraction:
+
+```{r}
+# Differentiate sin(x) at x = pi/4
+result <- differentiate_n(sin, pi / 4, order = 2)
+result$value   # sin(pi/4)
+result$d1      # cos(pi/4) = f'
+result$d2      # -sin(pi/4) = f''
+```
+
+Verify against known values:
+
+```{r}
+result$value - sin(pi / 4)     # ~0
+result$d1 - cos(pi / 4)        # ~0
+result$d2 - (-sin(pi / 4))     # ~0
+```
+
+More complex functions work too:
+
+```{r}
+f <- function(x) x * exp(-x^2)
+d2 <- differentiate_n(f, 1, order = 2)
+
+# Analytical: f'(x) = exp(-x^2)(1 - 2x^2)
+# f''(x) = exp(-x^2)(-6x + 4x^3)
+analytical_f1 <- exp(-1) * (1 - 2)
+analytical_f2 <- exp(-1) * (-6 + 4)
+d2$d1 - analytical_f1   # ~0
+d2$d2 - analytical_f2   # ~0
+```
+
+These low-level functions are useful for understanding how `nabla` works
+internally, but for most applications, `D()`, `gradient()`, and `hessian()`
+are the recommended interface.
 
 ## Summary
 
-Nested dual numbers extend forward-mode AD to second derivatives in a
-single forward pass — no symbolic differentiation, no finite-difference
+The `D` operator provides exact higher-order derivatives through a single
+composable interface — no symbolic differentiation, no finite-difference
 grid, and no loss of precision:
 
-- **Exact second derivatives.** By nesting $\varepsilon_1$ inside
-  $\varepsilon_2$, every arithmetic operation simultaneously propagates
-  $f(x)$, $f'(x)$, and $f''(x)$.
-- **This is the engine behind `hessian()`.** The convenience function
-  `hessian()` constructs nested duals internally for each parameter pair
-  and extracts the second-derivative matrix — the same arithmetic shown
-  in the manual construction above.
-- **Practical applications.** Curvature analysis, Taylor approximation, and
-  Newton-Raphson optimization all depend on accurate second derivatives.
-  Nested duals provide these without the step-size tuning that plagues
-  numerical second differences.
+- **Exact curvature and Taylor coefficients.** `D(f, x, order = 2)` gives
+  the exact second derivative needed for curvature analysis, Taylor
+  expansion, and Newton-Raphson optimization.
+- **Exact standard errors for MLE.** The Hessian from `hessian()` directly
+  yields the observed information matrix. Its inverse gives the asymptotic
+  variance-covariance matrix — the foundation of confidence intervals and
+  hypothesis tests in likelihood-based inference.
+- **Arbitrary order.** `D(f, x, order = 3)` yields third-order tensors for
+  asymptotic skewness analysis (see `vignette("mle-skewness")`); higher
+  orders work the same way.
+- **Nested duals under the hood.** Internally, `D` constructs nested dual
+  numbers at each order level. The same arithmetic that propagates first
+  derivatives recursively propagates second, third, and higher derivatives.

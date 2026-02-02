@@ -11,7 +11,7 @@
 #' @exportClass dualr
 setClass("dualr", slots = list(value = "ANY", deriv = "ANY"))
 
-# -- Internal fast constructor (bypasses dual() wrapper) ----------------------
+# -- Internal fast constructor -------------------------------------------------
 
 .dual <- function(value, deriv) new("dualr", value = value, deriv = deriv)
 
@@ -161,7 +161,7 @@ is_dual <- function(x) {
   is(x, "dualr")
 }
 
-# -- is.numeric: return TRUE so defensive checks pass -------------------------
+# -- is.numeric ----------------------------------------------------------------
 
 #' Check if a dual number is numeric
 #'
@@ -180,7 +180,7 @@ NULL
 #' @export
 setMethod("is.numeric", "dualr", function(x) TRUE)
 
-# -- c() method: collect duals into a dual_vector -----------------------------
+# -- c() method ----------------------------------------------------------------
 
 #' Combine dual numbers into a dual_vector
 #'
@@ -206,13 +206,11 @@ setMethod("c", "dualr", function(x, ..., recursive = FALSE) {
   dual_vector(args)
 })
 
-# -- Internal helper: promote numeric to dual constant -------------------------
+# -- Internal helpers ----------------------------------------------------------
 
 .as_dual <- function(x) {
   if (is(x, "dualr")) x else .dual(x, 0)
 }
-
-# -- Internal helpers: pairwise min/max for Reduce() ---------------------------
 
 .dual_min <- function(a, b) if (a@value <= b@value) a else b
 .dual_max <- function(a, b) if (a@value >= b@value) a else b

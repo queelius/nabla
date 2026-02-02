@@ -18,10 +18,9 @@ library(nabla)
 ## Motivation
 
 The `D` operator composes to arbitrary order: `D(f, x, order = k)` returns
-the $k$-th derivative tensor.  Gradients ($k = 1$) and Hessians ($k = 2$)
-are standard tools for maximum likelihood estimation. But third-order
-derivatives unlock additional diagnostic information — in particular, the
-**asymptotic skewness** of the MLE.
+the $k$-th derivative tensor. Gradients ($k = 1$) and Hessians ($k = 2$)
+are standard MLE tools. Third-order derivatives unlock additional diagnostic
+information — in particular, the **asymptotic skewness** of the MLE.
 
 This vignette demonstrates `D(f, x, order = 3)` on a Gamma MLE problem,
 computing:
@@ -33,13 +32,13 @@ computing:
 
 ## The Gamma model
 
-We observe $x_1, \ldots, x_n \sim \text{Gamma}(\alpha, \beta)$ with shape
-$\alpha > 0$ and rate $\beta > 0$. The log-likelihood, written in terms of
-sufficient statistics $S_1 = \sum \log x_i$ and $S_2 = \sum x_i$, is:
+Given $x_1, \ldots, x_n \sim \text{Gamma}(\alpha, \beta)$ with shape
+$\alpha > 0$ and rate $\beta > 0$, the log-likelihood in terms of
+sufficient statistics $S_1 = \sum \log x_i$ and $S_2 = \sum x_i$ is:
 
 $$\ell(\alpha, \beta) = n\alpha\log\beta - n\log\Gamma(\alpha) + (\alpha - 1)S_1 - \beta S_2$$
 
-This model is ideal for demonstrating third-order AD because:
+This model is ideal for third-order AD because:
 
 - It involves `lgamma`, exercising `nabla`'s special function support
 - The Hessian depends only on $(\alpha, \beta)$, not the data
@@ -68,7 +67,7 @@ ll_gamma <- function(theta) {
 
 ## Finding the MLE
 
-We use `optim` with AD gradients to find the MLE:
+`optim` with AD gradients finds the MLE:
 
 ```{r}
 fit <- optim(
@@ -128,10 +127,10 @@ cat("SE(beta_hat)  =", se[2], "\n")
 
 ## Third-order derivative tensor
 
-The real payoff of `D(f, x, order = 3)` is the third-order derivative
-tensor $T_{rst} = \partial^3 \ell / \partial\theta_r\partial\theta_s\partial\theta_t$.
+`D(f, x, order = 3)` returns the third-order derivative tensor
+$T_{rst} = \partial^3 \ell / \partial\theta_r\partial\theta_s\partial\theta_t$.
 For a two-parameter model, this is a $2 \times 2 \times 2$ array with 8
-entries (though symmetry reduces the distinct values).
+entries (symmetry reduces the distinct values).
 
 ```{r}
 T3 <- D(ll_gamma, theta_hat, order = 3)
@@ -208,8 +207,8 @@ are bounded below by zero.
 
 ## Monte Carlo validation
 
-We validate the theoretical skewness by simulating many datasets and
-computing the MLE for each.
+Validating the theoretical skewness by simulating many datasets and
+computing the MLE for each:
 
 ```{r}
 skewness <- function(x) {
@@ -262,8 +261,8 @@ asymptotic skewness formula.
 
 ## Visualizing MLE asymmetry
 
-The histograms show the sampling distribution of the MLEs, with the
-asymmetric shape predicted by the skewness analysis:
+The sampling distributions of the MLEs show the asymmetric shape predicted
+by the skewness analysis:
 
 ```{r fig-mle-histograms, fig.width=7, fig.height=3.5}
 par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))

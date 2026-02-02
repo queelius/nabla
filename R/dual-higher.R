@@ -1,16 +1,10 @@
 # Higher-order derivatives via nested dual numbers
 #
-# Arbitrary-order derivatives are computed by recursively nesting duals.
-# At each nesting level, the dual tracks d/dx of the level below.
-#
-# For order n, the seeding structure is:
+# Seeding structure for order n:
 #   n=0: just x (plain numeric)
 #   n=1: dual(x, 1)
 #   n=2: dual(dual(x, 1), dual(1, 0))
 #   n=3: dual(dual(dual(x, 1), dual(1, 0)), dual(dual(1, 0), dual(0, 0)))
-#
-# Extraction: deriv_n(result, k) applies @deriv k times, then walks
-# @value the rest of the way down to get the k-th derivative.
 
 # =============================================================================
 # Arbitrary-order constructors
@@ -91,11 +85,9 @@ deriv_n <- function(d, k) {
   k <- as.integer(k)
   if (k < 0L) stop("k must be a non-negative integer")
   if (k == 0L) {
-    # Walk all the way down through value slots
     while (is(d, "dualr")) d <- d@value
     return(d)
   }
-  # Take one deriv, then recurse
   if (!is(d, "dualr")) return(0)
   deriv_n(d@deriv, k - 1L)
 }
@@ -133,4 +125,3 @@ differentiate_n <- function(f, x, order) {
   }
   out
 }
-

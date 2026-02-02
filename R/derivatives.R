@@ -1,14 +1,9 @@
-# Multi-parameter derivative functions
+# Multi-parameter derivative functions (gradient, Hessian, Jacobian, D)
 #
-# High-level functions for computing gradients, Hessians, and Jacobians
-# of arbitrary functions using forward-mode AD.
-#
-# The function signature convention:
-#   f(x) where x supports x[1], x[2], ... indexing
-#   This works with both numeric vectors and dual_vector objects.
+# Convention: f(x) where x supports x[1], x[2], ... indexing.
+# This works with both numeric vectors and dual_vector objects.
 
-# -- Internal: build a dual_vector seeding parameter i with deriv=1 -----------
-# (used by jacobian, which differentiates a vector-valued function)
+# -- Internal helpers ----------------------------------------------------------
 
 .make_dual_vector <- function(x, seed_index) {
   p <- length(x)
@@ -88,7 +83,6 @@ jacobian <- function(f, x) {
 
 # -- Internal tensor helpers ---------------------------------------------------
 
-# Determine output shape of f's result (before derivative extraction)
 .D_output_shape <- function(result) {
   if (is(result, "dualr")) return(integer(0))             # scalar
   if (is.numeric(result) && length(result) == 1L) return(integer(0))
@@ -103,7 +97,6 @@ jacobian <- function(f, x) {
   stop("D: unsupported return type from f")
 }
 
-# Flatten result to list of scalar elements
 .D_flatten <- function(result) {
   if (is(result, "dualr")) return(list(result))
   if (is.numeric(result) && length(result) == 1L) return(list(result))
@@ -113,15 +106,12 @@ jacobian <- function(f, x) {
   stop("D: unsupported return type from f")
 }
 
-# Extract derivative from single element
 .D_extract_deriv <- function(x) {
   if (is(x, "dualr")) return(x@deriv)
   0
 }
 
-# Build output tensor from flat derivative list
-# all_derivs: length m*n, ordered [j=1 block, j=2 block, ...]
-# R column-major: last dim varies slowest -> contiguous j-blocks
+# all_derivs: length m*n, column-major [j=1 block, j=2 block, ...]
 .D_build_tensor <- function(all_derivs, out_shape, n) {
   tensor_shape <- if (length(out_shape) == 0L) n else c(out_shape, n)
   has_dual <- FALSE
@@ -201,7 +191,6 @@ D <- function(f, x = NULL, order = 1L) {
 
 .eval_D <- function(f, x) {
   n <- length(x)
-  # First pass: probe output shape + collect first column of derivatives
   x1 <- .make_dual_vector(x, 1L)
   result1 <- f(x1)
   out_shape <- .D_output_shape(result1)
@@ -209,7 +198,6 @@ D <- function(f, x = NULL, order = 1L) {
   m <- length(elems1)
   all_derivs <- vector("list", m * n)
   for (k in seq_len(m)) all_derivs[[k]] <- .D_extract_deriv(elems1[[k]])
-  # Remaining passes
   if (n > 1L) {
     for (j in 2:n) {
       xj <- .make_dual_vector(x, j)

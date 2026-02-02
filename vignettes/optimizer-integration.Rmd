@@ -17,10 +17,9 @@ library(nabla)
 
 ## Introduction
 
-The `gradient()` and `hessian()` functions in `nabla` return **plain numeric
-vectors and matrices** — exactly what R's built-in optimizers expect. This
-vignette shows how to plug AD derivatives into `optim()` and `nlminb()` for
-optimization.
+`gradient()` and `hessian()` return **plain numeric vectors and matrices**
+— exactly what R's built-in optimizers expect. This vignette shows how to
+plug AD derivatives into `optim()` and `nlminb()` for optimization.
 
 **The integration pattern:**
 
@@ -49,7 +48,7 @@ maximization (e.g., MLE), negate everything:
 
 ## `optim()` with AD gradients
 
-Let's fit a Normal($\mu$, $\sigma$) model using `optim()`. First, define the
+Fitting a Normal($\mu$, $\sigma$) model with `optim()`. First, the
 log-likelihood with sufficient statistics:
 
 ```{r}
@@ -74,7 +73,7 @@ The AD chain rule propagates through `exp()` automatically, so `gradient()` and
 `hessian()` return derivatives with respect to $(\mu, \log\sigma)$ without
 any manual Jacobian adjustment.
 
-Now compare BFGS **with** and **without** the AD gradient:
+Comparing BFGS **with** and **without** the AD gradient:
 
 ```{r}
 # Negated versions for minimization
@@ -140,8 +139,8 @@ from gradient history.
 
 ## Logistic regression example
 
-To demonstrate multi-parameter optimization, let's fit a logistic regression
-and compare with R's `glm()`:
+A multi-parameter example: fitting a logistic regression and comparing
+with R's `glm()`:
 
 ```{r}
 # Simulate data
@@ -157,7 +156,7 @@ y <- rbinom(n_lr, 1, prob_true)
 
 # Log-likelihood for nabla
 ll_logistic <- function(x) {
-  result <- dual_constant(0)
+  result <- 0
   for (i in seq_len(n_lr)) {
     eta_i <- x[1] * X[i, 1] + x[2] * X[i, 2] + x[3] * X[i, 3]
     result <- result + y[i] * eta_i - log(1 + exp(eta_i))
@@ -226,12 +225,15 @@ data.frame(
 ```
 
 The standard errors from AD's exact Hessian match `glm()`'s Fisher-scoring
-estimates closely (the ratio should be very near 1.0).
+estimates closely (the ratio should be near 1.0). This is the primary
+statistical motivation for AD: exact Hessians yield exact observed
+information, giving exact asymptotic standard errors and confidence
+intervals. Finite-difference Hessians introduce errors of order $10^{-5}$
+or larger for loop-based likelihoods, propagating directly into CI widths.
 
 ## Convergence comparison
 
-Let's compare how many iterations each optimizer strategy needs by tracking
-the negative log-likelihood at each step:
+Comparing iteration counts across optimizer strategies:
 
 ```{r fig-convergence, fig.width=6, fig.height=4.5}
 # Track convergence for three methods on the Normal(mu, sigma) model
@@ -336,10 +338,10 @@ legend("topright",
        lwd = c(1.5, 2, 2, 2), bty = "n", cex = 0.85)
 ```
 
-The Nelder-Mead simplex method (no derivatives) requires many more function
-evaluations and takes a wandering path. BFGS with the AD gradient converges
-more efficiently. `nlminb()` with both gradient and Hessian can achieve the
-most direct path to the optimum.
+Nelder-Mead (no derivatives) requires many more function evaluations and
+takes a wandering path. BFGS with the AD gradient converges more
+efficiently. `nlminb()` with both gradient and Hessian achieves the most
+direct path to the optimum.
 
 ## Summary
 

@@ -71,9 +71,6 @@ setMethod("Math", "dualr", function(x) {
     "trunc"   = .dual(trunc(v), 0),
     "round"   = .dual(round(v), 0),
 
-    # Note: sqrt, exp, and log have dedicated setMethod() dispatches above
-    # (and for log, below) that take priority over this group generic.
-
     # -- Exponential / logarithm --
     "expm1"   = .dual(expm1(v), d * exp(v)),
     "log2"    = .dual(log2(v), d / (v * log(2))),

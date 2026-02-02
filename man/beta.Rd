@@ -2,21 +2,15 @@
 % Please edit documentation in R/dual-special.R
 \name{beta}
 \alias{beta}
+\alias{beta,ANY,ANY-method}
 \alias{beta,numeric,numeric-method}
-\alias{beta,dualr,dualr-method}
-\alias{beta,dualr,numeric-method}
-\alias{beta,numeric,dualr-method}
 \title{Beta function for dual numbers}
 \usage{
 beta(a, b)
 
 \S4method{beta}{numeric,numeric}(a, b)
 
-\S4method{beta}{dualr,dualr}(a, b)
-
-\S4method{beta}{dualr,numeric}(a, b)
-
-\S4method{beta}{numeric,dualr}(a, b)
+\S4method{beta}{ANY,ANY}(a, b)
 }
 \arguments{
 \item{a}{A numeric or dual value.}
