@@ -104,12 +104,11 @@ trig functions, and all of R's math — no special cases needed.
 
 ## Vignettes
 
-<!-- Links work on the pkgdown site; use browseVignettes("nabla") locally -->
-- [Introduction to nabla](articles/introduction.html) — dual numbers, arithmetic, composition, comparison with finite differences
-- [MLE Workflow](articles/mle-workflow.html) — gradient, Hessian, Newton-Raphson on statistical models
-- [Higher-Order Derivatives](articles/higher-order.html) — the `D` operator, curvature, Taylor expansion
-- [Higher-Order MLE Analysis](articles/mle-skewness.html) — third-order derivative tensors and asymptotic skewness of MLEs
-- [Optimizer Integration](articles/optimizer-integration.html) — using `gradient()` and `hessian()` with `optim()` and `nlminb()`
+- [Introduction to nabla](https://queelius.github.io/nabla/articles/introduction.html) — dual numbers, arithmetic, composition, comparison with finite differences
+- [MLE Workflow](https://queelius.github.io/nabla/articles/mle-workflow.html) — gradient, Hessian, Newton-Raphson on statistical models
+- [Higher-Order Derivatives](https://queelius.github.io/nabla/articles/higher-order.html) — the `D` operator, curvature, Taylor expansion
+- [Higher-Order MLE Analysis](https://queelius.github.io/nabla/articles/mle-skewness.html) — third-order derivative tensors and asymptotic skewness of MLEs
+- [Optimizer Integration](https://queelius.github.io/nabla/articles/optimizer-integration.html) — using `gradient()` and `hessian()` with `optim()` and `nlminb()`
 
 ## License
 
