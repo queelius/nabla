@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Introduction to dualr • dualr</title>
+<title>Introduction to nabla • nabla</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to dualr">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to nabla">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -31,8 +31,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">dualr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
+        <a class="navbar-link" href="../index.html">nabla</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.0</span>
       </span>
     </div>
 
@@ -52,10 +52,13 @@
       <a href="../articles/higher-order.html">Higher-Order Derivatives</a>
     </li>
     <li>
-      <a href="../articles/introduction.html">Introduction to dualr</a>
+      <a href="../articles/introduction.html">Introduction to nabla</a>
     </li>
     <li>
-      <a href="../articles/mle-workflow.html">MLE Workflow with dualr</a>
+      <a href="../articles/mle-skewness.html">Higher-Order MLE Analysis</a>
+    </li>
+    <li>
+      <a href="../articles/mle-workflow.html">Gradient and Hessian Computation with nabla</a>
     </li>
     <li>
       <a href="../articles/optimizer-integration.html">Optimizer Integration</a>
@@ -68,7 +71,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/queelius/dualr/" class="external-link">
+  <a href="https://github.com/queelius/nabla/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
 
   </a>
@@ -86,10 +89,10 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Introduction to dualr</h1>
+      <h1 data-toc-skip>Introduction to nabla</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/queelius/dualr/blob/HEAD/vignettes/introduction.Rmd" class="external-link"><code>vignettes/introduction.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/queelius/nabla/blob/HEAD/vignettes/introduction.Rmd" class="external-link"><code>vignettes/introduction.Rmd</code></a></small>
       <div class="hidden name"><code>introduction.Rmd</code></div>
 
     </div>
@@ -97,12 +100,12 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/queelius/dualr" class="external-link">dualr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/queelius/nabla" class="external-link">nabla</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dualr'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; Attaching package: 'nabla'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     deriv</span></span></code></pre></div>
+<span><span class="co">#&gt;     D, deriv</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="what-are-dual-numbers">What are dual numbers?<a class="anchor" aria-label="anchor" href="#what-are-dual-numbers"></a>
 </h2>
@@ -406,14 +409,14 @@ at
 <span></span>
 <span><span class="co"># Compare</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Analytical"</span>, <span class="st">"Finite Diff"</span>, <span class="st">"AD (dualr)"</span><span class="op">)</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Analytical"</span>, <span class="st">"Finite Diff"</span>, <span class="st">"AD (nabla)"</span><span class="op">)</span>,</span>
 <span>  derivative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">analytical</span>, <span class="va">finite_diff</span>, <span class="va">ad_result</span><span class="op">)</span>,</span>
 <span>  error_vs_analytical <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">finite_diff</span> <span class="op">-</span> <span class="va">analytical</span>, <span class="va">ad_result</span> <span class="op">-</span> <span class="va">analytical</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        method derivative error_vs_analytical</span></span>
 <span><span class="co">#&gt; 1  Analytical   7.582394         0.00000e+00</span></span>
 <span><span class="co">#&gt; 2 Finite Diff   7.582394        -1.17109e-07</span></span>
-<span><span class="co">#&gt; 3  AD (dualr)   7.582394         0.00000e+00</span></span></code></pre></div>
+<span><span class="co">#&gt; 3  AD (nabla)   7.582394         0.00000e+00</span></span></code></pre></div>
 <p>The AD result matches the analytical derivative to machine precision
 — zero error — because dual-number arithmetic propagates exact
 derivative rules through every operation. Finite differences, by
@@ -435,7 +438,7 @@ vivid:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">bp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html" class="external-link">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log10</a></span><span class="op">(</span><span class="va">errors</span><span class="op">)</span>,</span>
-<span>              names.arg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Finite Diff"</span>, <span class="st">"AD (dualr)"</span><span class="op">)</span>,</span>
+<span>              names.arg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Finite Diff"</span>, <span class="st">"AD (nabla)"</span><span class="op">)</span>,</span>
 <span>              col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"coral"</span>, <span class="st">"steelblue"</span><span class="op">)</span>,</span>
 <span>              ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">log</span><span class="op">[</span><span class="fl">10</span><span class="op">]</span> <span class="op">~</span> <span class="st">"|error|"</span><span class="op">)</span>,</span>
 <span>              main <span class="op">=</span> <span class="st">"Absolute error vs analytical derivative"</span>,</span>
@@ -456,8 +459,8 @@ cannot. To see how this pays off in practice:</p>
 <ul>
 <li>
 <strong><code><a href="../articles/mle-workflow.html">vignette("mle-workflow")</a></code></strong> applies
-<code><a href="../reference/score.html">score()</a></code>, <code><a href="../reference/hessian.html">hessian()</a></code>, and
-<code><a href="../reference/observed_information.html">observed_information()</a></code> to five increasingly complex MLE
+<code>score()</code>, <code><a href="../reference/hessian.html">hessian()</a></code>, and
+<code>observed_information()</code> to five increasingly complex MLE
 problems, from Normal to logistic regression, and builds a
 Newton-Raphson optimizer powered entirely by AD.</li>
 <li>
@@ -466,7 +469,7 @@ nested duals for second derivatives, with applications to curvature
 analysis and Taylor expansion.</li>
 <li>
 <strong><code><a href="../articles/optimizer-integration.html">vignette("optimizer-integration")</a></code></strong>
-shows how to plug <code>dualr</code> gradients into R’s built-in
+shows how to plug <code>nabla</code> gradients into R’s built-in
 optimizers (<code>optim</code>, <code>nlminb</code>) for
 production-quality MLE fitting.</li>
 </ul>

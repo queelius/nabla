@@ -1,40 +1,43 @@
 
 # nabla <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
-> Exact Derivatives via Automatic Differentiation
+> Arbitrary-order exact derivatives at machine precision
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/nabla)](https://CRAN.R-project.org/package=nabla)
 [![R-CMD-check](https://github.com/queelius/nabla/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/queelius/nabla/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-## Why automatic differentiation?
+`nabla` provides a single composable operator `D` that differentiates any
+R function to any order — exactly, at machine precision, through loops,
+branches, and all control flow:
 
-Computing derivatives is fundamental to optimization, statistics, and scientific
-computing. The three main approaches are:
+```r
+library(nabla)
+f <- function(x) x[1]^2 * exp(x[2])
+
+D(f, c(1, 0))                # gradient
+D(f, c(1, 0), order = 2)     # Hessian
+D(f, c(1, 0), order = 3)     # 2×2×2 third-order tensor
+D(f, c(1, 0), order = 4)     # 2×2×2×2 fourth-order tensor
+```
+
+Each application of `D` adds one dimension to the output. `D(D(f))` gives
+the Hessian, `D(D(D(f)))` gives the third-order tensor, and so on —
+no limit on order, no loss of precision, no symbolic algebra.
+
+## Why nabla?
 
 | | **Finite Differences** | **Symbolic Diff** | **AD (nabla)** |
 |---|---|---|---|
-| **Accuracy** | O(h) or O(h²) truncation error | Exact | Exact (machine precision) |
-| **Cost** | 2p function evaluations | Expression swell for complex f | p forward passes |
-| **Control flow** | Works | Breaks on if/for/while | Works through any code |
-| **Implementation** | Easy | Requires CAS | Operator overloading |
+| **Accuracy** | O(h) or O(h²) truncation error | Exact | **Exact (machine precision)** |
+| **Higher-order** | Error compounds rapidly | Expression swell | **Composes cleanly to any order** |
+| **Control flow** | Works | Breaks on if/for/while | **Works through any code** |
 
-Finite differences are inaccurate for ill-conditioned problems. Symbolic
-differentiation suffers from expression swell and cannot handle control flow.
-**Automatic differentiation** gives exact derivatives at machine precision
-through any R code — loops, branches, and all.
-
-## How it works
-
-A dual number extends the reals with an infinitesimal ε where ε² = 0:
-
-$$f(x + \varepsilon) = f(x) + f'(x)\,\varepsilon$$
-
-By propagating ε through every arithmetic operation and math function,
-`nabla` computes f(x) and f'(x) simultaneously in a single forward pass.
-No symbolic manipulation, no finite step sizes — just exact derivatives
-via the algebra of dual numbers.
+Finite differences lose precision at higher orders (each order multiplies
+the error). Symbolic differentiation suffers from expression swell.
+`nabla` composes `D` via nested dual numbers — each order is as precise
+as the first.
 
 ## Installation
 
@@ -46,46 +49,58 @@ install.packages("nabla")
 remotes::install_github("queelius/nabla")
 ```
 
-## Quick start
+## The `D` operator
 
-**Single variable derivative:**
-
-```r
-library(nabla)
-
-# Create a dual variable at x = 2 (seeds derivative tracking)
-x <- dual_variable(2)
-
-# Evaluate any expression — derivatives propagate automatically
-result <- x^3 + sin(x)
-value(result)   # f(2) = 8.909
-deriv(result)   # f'(2) = 3*4 + cos(2) = 11.584
-```
-
-**Multi-parameter derivatives:**
+`D` is the core of `nabla`. It differentiates any function `f` and
+returns a new function — which can itself be differentiated:
 
 ```r
 f <- function(x) x[1]^2 * x[2] + sin(x[2])
 
-# Gradient — exact, no finite differences
-gradient(f, c(3, 4))
+Df   <- D(f)          # first derivative (function)
+DDf  <- D(Df)         # second derivative (function)
+DDDf <- D(DDf)        # third derivative (function)
 
-# Hessian matrix — exact second derivatives
-hessian(f, c(3, 4))
+Df(c(3, 4))           # gradient vector
+DDf(c(3, 4))          # Hessian matrix
+DDDf(c(3, 4))         # 2×2×2 tensor
+```
 
-# The D operator composes to any order
+Equivalently, evaluate directly at a point:
+
+```r
 D(f, c(3, 4))              # gradient
 D(f, c(3, 4), order = 2)   # Hessian
 D(f, c(3, 4), order = 3)   # third-order tensor
 ```
 
+`gradient()`, `hessian()`, and `jacobian()` are convenience wrappers:
+
+```r
+gradient(f, c(3, 4))       # == D(f, c(3, 4))
+hessian(f, c(3, 4))        # == D(f, c(3, 4), order = 2)
+```
+
+## How it works
+
+A dual number extends the reals with an infinitesimal ε where ε² = 0:
+
+$$f(x + \varepsilon) = f(x) + f'(x)\,\varepsilon$$
+
+For higher orders, `nabla` nests dual numbers: a dual whose components are
+themselves duals. Each level of nesting extracts one additional order of
+derivative — so `D(D(D(f)))` propagates through triply-nested duals to
+produce exact third derivatives. This works through `lgamma`, `psigamma`,
+trig functions, and all of R's math — no special cases needed.
+
 ## Use cases
 
 - **Optimization** — supply exact gradients to `optim()` and `nlminb()`
-- **Maximum likelihood estimation** — gradients, Hessians, and standard errors
+- **Maximum likelihood** — Hessians for standard errors, third-order tensors
+  for asymptotic skewness of MLEs
 - **Sensitivity analysis** — how outputs change with respect to inputs
-- **Taylor approximation** — compute polynomial approximations with exact coefficients
-- **Curvature analysis** — second-order geometric properties of curves
+- **Taylor approximation** — exact coefficients to any order
+- **Curvature analysis** — second-order geometric properties
 
 ## Vignettes
 

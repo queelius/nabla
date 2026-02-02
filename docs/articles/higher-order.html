@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Higher-Order Derivatives • dualr</title>
+<title>Higher-Order Derivatives • nabla</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -31,8 +31,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">dualr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
+        <a class="navbar-link" href="../index.html">nabla</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.0</span>
       </span>
     </div>
 
@@ -52,10 +52,13 @@
       <a href="../articles/higher-order.html">Higher-Order Derivatives</a>
     </li>
     <li>
-      <a href="../articles/introduction.html">Introduction to dualr</a>
+      <a href="../articles/introduction.html">Introduction to nabla</a>
     </li>
     <li>
-      <a href="../articles/mle-workflow.html">MLE Workflow with dualr</a>
+      <a href="../articles/mle-skewness.html">Higher-Order MLE Analysis</a>
+    </li>
+    <li>
+      <a href="../articles/mle-workflow.html">Gradient and Hessian Computation with nabla</a>
     </li>
     <li>
       <a href="../articles/optimizer-integration.html">Optimizer Integration</a>
@@ -68,7 +71,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/queelius/dualr/" class="external-link">
+  <a href="https://github.com/queelius/nabla/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
 
   </a>
@@ -89,7 +92,7 @@
       <h1 data-toc-skip>Higher-Order Derivatives</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/queelius/dualr/blob/HEAD/vignettes/higher-order.Rmd" class="external-link"><code>vignettes/higher-order.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/queelius/nabla/blob/HEAD/vignettes/higher-order.Rmd" class="external-link"><code>vignettes/higher-order.Rmd</code></a></small>
       <div class="hidden name"><code>higher-order.Rmd</code></div>
 
     </div>
@@ -97,12 +100,12 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/queelius/dualr" class="external-link">dualr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/queelius/nabla" class="external-link">nabla</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dualr'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; Attaching package: 'nabla'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     deriv</span></span></code></pre></div>
+<span><span class="co">#&gt;     D, deriv</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="nested-duals">Nested duals<a class="anchor" aria-label="anchor" href="#nested-duals"></a>
 </h2>
@@ -112,7 +115,7 @@ and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f'(x)</annotation></semantics></math>.
 To also get
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mi>″</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f''(x)</annotation></semantics></math>,
-<code>dualr</code> uses <strong>nested duals</strong> — a dual number
+<code>nabla</code> uses <strong>nested duals</strong> — a dual number
 whose components are themselves dual numbers.</p>
 <p>The structure <code>dual(dual(x, 1), dual(1, 0))</code>
 simultaneously tracks:</p>
@@ -128,64 +131,113 @@ simultaneously tracks:</p>
 — the derivative of the outer derivative</li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dual2_variable.html">dual2_variable</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dual_variable_n.html">dual_variable_n</a></span><span class="op">(</span><span class="fl">2</span>, order <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Evaluate x^3</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">^</span><span class="fl">3</span></span>
 <span></span>
 <span><span class="co"># Extract all three quantities</span></span>
-<span><span class="fu"><a href="../reference/value2.html">value2</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>       <span class="co"># f(2) = 8</span></span>
+<span><span class="fu"><a href="../reference/deriv_n.html">deriv_n</a></span><span class="op">(</span><span class="va">result</span>, <span class="fl">0</span><span class="op">)</span>  <span class="co"># f(2) = 8</span></span>
 <span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="fu"><a href="../reference/first_deriv.html">first_deriv</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>  <span class="co"># f'(2) = 3*4 = 12</span></span>
+<span><span class="fu"><a href="../reference/deriv_n.html">deriv_n</a></span><span class="op">(</span><span class="va">result</span>, <span class="fl">1</span><span class="op">)</span>  <span class="co"># f'(2) = 3*4 = 12</span></span>
 <span><span class="co">#&gt; [1] 12</span></span>
-<span><span class="fu"><a href="../reference/second_deriv.html">second_deriv</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="co"># f''(2) = 6*2 = 12</span></span>
+<span><span class="fu"><a href="../reference/deriv_n.html">deriv_n</a></span><span class="op">(</span><span class="va">result</span>, <span class="fl">2</span><span class="op">)</span>  <span class="co"># f''(2) = 6*2 = 12</span></span>
 <span><span class="co">#&gt; [1] 12</span></span></code></pre></div>
-<p>For constants in second-order computations, use
-<code><a href="../reference/dual2_constant.html">dual2_constant()</a></code>:</p>
+<p>For constants in higher-order computations, use
+<code><a href="../reference/dual_constant_n.html">dual_constant_n()</a></code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dual2_constant.html">dual2_constant</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/value2.html">value2</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>        <span class="co"># 5</span></span>
+<code class="sourceCode R"><span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dual_constant_n.html">dual_constant_n</a></span><span class="op">(</span><span class="fl">5</span>, order <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/deriv_n.html">deriv_n</a></span><span class="op">(</span><span class="va">k</span>, <span class="fl">0</span><span class="op">)</span>  <span class="co"># 5</span></span>
 <span><span class="co">#&gt; [1] 5</span></span>
-<span><span class="fu"><a href="../reference/first_deriv.html">first_deriv</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>   <span class="co"># 0</span></span>
+<span><span class="fu"><a href="../reference/deriv_n.html">deriv_n</a></span><span class="op">(</span><span class="va">k</span>, <span class="fl">1</span><span class="op">)</span>  <span class="co"># 0</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="fu"><a href="../reference/second_deriv.html">second_deriv</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>  <span class="co"># 0</span></span>
+<span><span class="fu"><a href="../reference/deriv_n.html">deriv_n</a></span><span class="op">(</span><span class="va">k</span>, <span class="fl">2</span><span class="op">)</span>  <span class="co"># 0</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="the-differentiate2-helper">The <code>differentiate2()</code> helper<a class="anchor" aria-label="anchor" href="#the-differentiate2-helper"></a>
+<h2 id="the-differentiate_n-helper">The <code>differentiate_n()</code> helper<a class="anchor" aria-label="anchor" href="#the-differentiate_n-helper"></a>
 </h2>
-<p>For quick evaluation, <code><a href="../reference/differentiate2.html">differentiate2()</a></code> wraps the
+<p>For quick evaluation, <code><a href="../reference/differentiate_n.html">differentiate_n()</a></code> wraps the
 construction and extraction:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Differentiate sin(x) at x = pi/4</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiate2.html">differentiate2</a></span><span class="op">(</span><span class="va">sin</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiate_n.html">differentiate_n</a></span><span class="op">(</span><span class="va">sin</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span>, order <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">result</span><span class="op">$</span><span class="va">value</span>   <span class="co"># sin(pi/4)</span></span>
 <span><span class="co">#&gt; [1] 0.7071068</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">first</span>   <span class="co"># cos(pi/4) = f'</span></span>
+<span><span class="va">result</span><span class="op">$</span><span class="va">d1</span>      <span class="co"># cos(pi/4) = f'</span></span>
 <span><span class="co">#&gt; [1] 0.7071068</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">second</span>  <span class="co"># -sin(pi/4) = f''</span></span>
+<span><span class="va">result</span><span class="op">$</span><span class="va">d2</span>      <span class="co"># -sin(pi/4) = f''</span></span>
 <span><span class="co">#&gt; [1] -0.7071068</span></span></code></pre></div>
 <p>Verify against known values:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">result</span><span class="op">$</span><span class="va">value</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span>      <span class="co"># ~0</span></span>
+<code class="sourceCode R"><span><span class="va">result</span><span class="op">$</span><span class="va">value</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span>     <span class="co"># ~0</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">first</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span>      <span class="co"># ~0</span></span>
+<span><span class="va">result</span><span class="op">$</span><span class="va">d1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span>        <span class="co"># ~0</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">second</span> <span class="op">-</span> <span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span>  <span class="co"># ~0</span></span>
+<span><span class="va">result</span><span class="op">$</span><span class="va">d2</span> <span class="op">-</span> <span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span>     <span class="co"># ~0</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
 <p>More complex functions work too:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiate2.html">differentiate2</a></span><span class="op">(</span><span class="va">f</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiate_n.html">differentiate_n</a></span><span class="op">(</span><span class="va">f</span>, <span class="fl">1</span>, order <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Analytical: f'(x) = exp(-x^2)(1 - 2x^2)</span></span>
 <span><span class="co"># f''(x) = exp(-x^2)(-6x + 4x^3)</span></span>
 <span><span class="va">analytical_f1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">analytical_f2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="op">-</span><span class="fl">6</span> <span class="op">+</span> <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="va">d2</span><span class="op">$</span><span class="va">first</span> <span class="op">-</span> <span class="va">analytical_f1</span>   <span class="co"># ~0</span></span>
+<span><span class="va">d2</span><span class="op">$</span><span class="va">d1</span> <span class="op">-</span> <span class="va">analytical_f1</span>   <span class="co"># ~0</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="va">d2</span><span class="op">$</span><span class="va">second</span> <span class="op">-</span> <span class="va">analytical_f2</span>  <span class="co"># ~0</span></span>
+<span><span class="va">d2</span><span class="op">$</span><span class="va">d2</span> <span class="op">-</span> <span class="va">analytical_f2</span>   <span class="co"># ~0</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="the-d-operator">The <code>D</code> operator<a class="anchor" aria-label="anchor" href="#the-d-operator"></a>
+</h2>
+<p>The <code>D</code> operator provides a composable way to compute
+derivatives of multi-parameter functions. <code>D(f)</code> returns the
+derivative of <code>f</code> as a new function, and compositions
+<code>D(D(f))</code> yield higher-order derivative tensors:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Gradient of a 2-parameter function</span></span>
+<span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span> <span class="op">*</span> <span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span><span class="fu"><a href="../reference/D.html">D</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>  <span class="co"># gradient: c(24, 9)</span></span>
+<span><span class="co">#&gt; [1] 24  9</span></span>
+<span></span>
+<span><span class="co"># Hessian via D^2</span></span>
+<span><span class="fu"><a href="../reference/D.html">D</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>, order <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      [,1] [,2]</span></span>
+<span><span class="co">#&gt; [1,]    8    6</span></span>
+<span><span class="co">#&gt; [2,]    6    0</span></span>
+<span></span>
+<span><span class="co"># Composition works identically</span></span>
+<span><span class="va">Df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/D.html">D</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
+<span><span class="va">DDf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/D.html">D</a></span><span class="op">(</span><span class="va">Df</span><span class="op">)</span></span>
+<span><span class="fu">DDf</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      [,1] [,2]</span></span>
+<span><span class="co">#&gt; [1,]    8    6</span></span>
+<span><span class="co">#&gt; [2,]    6    0</span></span></code></pre></div>
+<p>For vector-valued functions, <code>D</code> produces the
+Jacobian:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">g</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/D.html">D</a></span><span class="op">(</span><span class="va">g</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>  <span class="co"># 2x2 Jacobian: [[4, 3], [6, 1]]</span></span>
+<span><span class="co">#&gt;      [,1] [,2]</span></span>
+<span><span class="co">#&gt; [1,]    4    3</span></span>
+<span><span class="co">#&gt; [2,]    6    1</span></span></code></pre></div>
+<p>The convenience functions <code><a href="../reference/gradient.html">gradient()</a></code>,
+<code><a href="../reference/hessian.html">hessian()</a></code>, and <code><a href="../reference/jacobian.html">jacobian()</a></code> are thin wrappers
+around <code>D</code>:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/gradient.html">gradient</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>           <span class="co"># == D(f, c(3, 4))</span></span>
+<span><span class="co">#&gt; [1] 24  9</span></span>
+<span><span class="fu"><a href="../reference/hessian.html">hessian</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>            <span class="co"># == D(f, c(3, 4), order = 2)</span></span>
+<span><span class="co">#&gt;      [,1] [,2]</span></span>
+<span><span class="co">#&gt; [1,]    8    6</span></span>
+<span><span class="co">#&gt; [2,]    6    0</span></span>
+<span><span class="fu"><a href="../reference/jacobian.html">jacobian</a></span><span class="op">(</span><span class="va">g</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>           <span class="co"># == D(g, c(3, 4))</span></span>
+<span><span class="co">#&gt;      [,1] [,2]</span></span>
+<span><span class="co">#&gt; [1,]    4    3</span></span>
+<span><span class="co">#&gt; [2,]    6    1</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="curvature-analysis">Curvature analysis<a class="anchor" aria-label="anchor" href="#curvature-analysis"></a>
@@ -195,10 +247,10 @@ construction and extraction:</p>
 is:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>κ</mi><mo>=</mo><mfrac><mrow><mo stretchy="true" form="prefix">|</mo><mi>f</mi><mi>″</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><msup><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mi>f</mi><mi>′</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mn>3</mn><mi>/</mi><mn>2</mn></mrow></msup></mfrac></mrow><annotation encoding="application/x-tex">\kappa = \frac{|f''(x)|}{(1 + f'(x)^2)^{3/2}}</annotation></semantics></math></p>
 <p>With second-order AD, we can compute this directly:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">curvature</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">f</span>, <span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiate2.html">differentiate2</a></span><span class="op">(</span><span class="va">f</span>, <span class="va">x</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">d2</span><span class="op">$</span><span class="va">second</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="va">d2</span><span class="op">$</span><span class="va">first</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">^</span><span class="op">(</span><span class="fl">3</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiate_n.html">differentiate_n</a></span><span class="op">(</span><span class="va">f</span>, <span class="va">x</span>, order <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">d2</span><span class="op">$</span><span class="va">d2</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="va">d2</span><span class="op">$</span><span class="va">d1</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">^</span><span class="op">(</span><span class="fl">3</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Curvature of sin(x) at various points</span></span>
@@ -238,7 +290,7 @@ has maximum curvature because
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">|</mo><mo>sin</mo><mi>″</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>π</mi><mi>/</mi><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">|</mo></mrow><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">|\sin''(\pi/2)| = 1</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>sin</mo><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>π</mi><mi>/</mi><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\sin'(\pi/2) = 0</annotation></semantics></math>:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">curvature</span><span class="op">(</span><span class="va">sin</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span>  <span class="co"># should be 1.0</span></span>
 <span><span class="co">#&gt; [1] 1</span></span></code></pre></div>
 <div class="section level3">
@@ -251,7 +303,7 @@ this occurs at
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">\pi/2</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mi>π</mi><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">3\pi/2</annotation></semantics></math>:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">xs_curve</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span>, length.out <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
 <span><span class="va">sin_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">xs_curve</span><span class="op">)</span></span>
 <span><span class="va">kappa_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">xs_curve</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">curvature</span><span class="op">(</span><span class="va">sin</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
@@ -292,10 +344,10 @@ around
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mn>0</mn></msub><annotation encoding="application/x-tex">x_0</annotation></semantics></math>:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>−</mo><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>f</mi><mi>″</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>−</mo><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">f(x) \approx f(x_0) + f'(x_0)(x - x_0) + \frac{1}{2} f''(x_0)(x - x_0)^2</annotation></semantics></math></p>
 <p>We can compute this using nested duals:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">taylor2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">f</span>, <span class="va">x0</span>, <span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiate2.html">differentiate2</a></span><span class="op">(</span><span class="va">f</span>, <span class="va">x0</span><span class="op">)</span></span>
-<span>  <span class="va">d2</span><span class="op">$</span><span class="va">value</span> <span class="op">+</span> <span class="va">d2</span><span class="op">$</span><span class="va">first</span> <span class="op">*</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">d2</span><span class="op">$</span><span class="va">second</span> <span class="op">*</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">x0</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span>
+<span>  <span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiate_n.html">differentiate_n</a></span><span class="op">(</span><span class="va">f</span>, <span class="va">x0</span>, order <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="va">d2</span><span class="op">$</span><span class="va">value</span> <span class="op">+</span> <span class="va">d2</span><span class="op">$</span><span class="va">d1</span> <span class="op">*</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">d2</span><span class="op">$</span><span class="va">d2</span> <span class="op">*</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">x0</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Approximate exp(x) near x = 0</span></span>
@@ -333,7 +385,7 @@ it drops to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>1.7</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>7</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\approx 1.7 \times 10^{-7}</annotation></semantics></math>
 — a factor-of-1000 reduction for a factor-of-10 decrease in distance,
 confirming cubic convergence. We can see this divergence visually:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">xs_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">3</span>, length.out <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
 <span><span class="va">exact_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">xs_plot</span><span class="op">)</span></span>
 <span><span class="va">taylor_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">xs_plot</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">taylor2</span><span class="op">(</span><span class="va">f_exp</span>, <span class="fl">0</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
@@ -359,13 +411,13 @@ polynomial approximation.</p>
 <div class="section level2">
 <h2 id="connection-to-mle-hessian-via-nested-duals">Connection to MLE: Hessian via nested duals<a class="anchor" aria-label="anchor" href="#connection-to-mle-hessian-via-nested-duals"></a>
 </h2>
-<p>The <code><a href="../reference/hessian.html">hessian()</a></code> function in <code>dualr</code> uses nested
-duals internally. We can verify this by manually constructing a
-second-order dual for a log-likelihood and comparing with the
-<code><a href="../reference/hessian.html">hessian()</a></code> helper.</p>
+<p>The <code><a href="../reference/hessian.html">hessian()</a></code> function in <code>nabla</code> uses the
+<code>D</code> operator internally. We can verify this by manually
+constructing a second-order dual for a log-likelihood and comparing with
+the <code><a href="../reference/hessian.html">hessian()</a></code> helper.</p>
 <p>Consider a Poisson log-likelihood for
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span><span class="va">data_pois</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">50</span>, lambda <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">data_pois</span><span class="op">)</span></span>
@@ -379,21 +431,21 @@ second-order dual for a log-likelihood and comparing with the
 <span></span>
 <span><span class="va">lambda0</span> <span class="op">&lt;-</span> <span class="fl">2.5</span></span></code></pre></div>
 <p><strong>Method 1</strong>: Using <code><a href="../reference/hessian.html">hessian()</a></code> helper:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hess_helper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hessian.html">hessian</a></span><span class="op">(</span><span class="va">ll_poisson</span>, <span class="va">lambda0</span><span class="op">)</span></span>
 <span><span class="va">hess_helper</span></span>
 <span><span class="co">#&gt;       [,1]</span></span>
 <span><span class="co">#&gt; [1,] -24.8</span></span></code></pre></div>
 <p><strong>Method 2</strong>: Manual nested dual construction:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Build a dual2_variable wrapped in a dual_vector</span></span>
-<span><span class="va">manual_theta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dual_vector.html">dual_vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="../reference/dual2_variable.html">dual2_variable</a></span><span class="op">(</span><span class="va">lambda0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Build a dual_variable_n wrapped in a dual_vector</span></span>
+<span><span class="va">manual_theta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dual_vector.html">dual_vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="../reference/dual_variable_n.html">dual_variable_n</a></span><span class="op">(</span><span class="va">lambda0</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">result_manual</span> <span class="op">&lt;-</span> <span class="fu">ll_poisson</span><span class="op">(</span><span class="va">manual_theta</span><span class="op">)</span></span>
 <span><span class="va">manual_hess</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/deriv.html">deriv</a></span><span class="op">(</span><span class="fu"><a href="../reference/deriv.html">deriv</a></span><span class="op">(</span><span class="va">result_manual</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">manual_hess</span></span>
 <span><span class="co">#&gt; [1] -24.8</span></span></code></pre></div>
 <p>Both approaches yield the same result:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hess_helper</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">-</span> <span class="va">manual_hess</span>  <span class="co"># ~0</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
 <p>This shows that <code><a href="../reference/hessian.html">hessian()</a></code> is simply an organized wrapper

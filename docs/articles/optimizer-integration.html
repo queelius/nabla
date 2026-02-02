@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Optimizer Integration • dualr</title>
+<title>Optimizer Integration • nabla</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -31,8 +31,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">dualr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
+        <a class="navbar-link" href="../index.html">nabla</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.0</span>
       </span>
     </div>
 
@@ -52,10 +52,13 @@
       <a href="../articles/higher-order.html">Higher-Order Derivatives</a>
     </li>
     <li>
-      <a href="../articles/introduction.html">Introduction to dualr</a>
+      <a href="../articles/introduction.html">Introduction to nabla</a>
     </li>
     <li>
-      <a href="../articles/mle-workflow.html">MLE Workflow with dualr</a>
+      <a href="../articles/mle-skewness.html">Higher-Order MLE Analysis</a>
+    </li>
+    <li>
+      <a href="../articles/mle-workflow.html">Gradient and Hessian Computation with nabla</a>
     </li>
     <li>
       <a href="../articles/optimizer-integration.html">Optimizer Integration</a>
@@ -68,7 +71,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/queelius/dualr/" class="external-link">
+  <a href="https://github.com/queelius/nabla/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
 
   </a>
@@ -89,7 +92,7 @@
       <h1 data-toc-skip>Optimizer Integration</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/queelius/dualr/blob/HEAD/vignettes/optimizer-integration.Rmd" class="external-link"><code>vignettes/optimizer-integration.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/queelius/nabla/blob/HEAD/vignettes/optimizer-integration.Rmd" class="external-link"><code>vignettes/optimizer-integration.Rmd</code></a></small>
       <div class="hidden name"><code>optimizer-integration.Rmd</code></div>
 
     </div>
@@ -97,20 +100,20 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/queelius/dualr" class="external-link">dualr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/queelius/nabla" class="external-link">nabla</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dualr'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; Attaching package: 'nabla'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     deriv</span></span></code></pre></div>
+<span><span class="co">#&gt;     D, deriv</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The <code><a href="../reference/score.html">score()</a></code> and <code><a href="../reference/hessian.html">hessian()</a></code> functions in
-<code>dualr</code> return <strong>plain numeric vectors and
+<p>The <code><a href="../reference/gradient.html">gradient()</a></code> and <code><a href="../reference/hessian.html">hessian()</a></code> functions in
+<code>nabla</code> return <strong>plain numeric vectors and
 matrices</strong> — exactly what R’s built-in optimizers expect. This
 vignette shows how to plug AD derivatives into <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> and
-<code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code> for maximum likelihood estimation.</p>
+<code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code> for optimization.</p>
 <p><strong>The integration pattern:</strong></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># optim() with AD gradient</span></span>
@@ -119,12 +122,12 @@ vignette shows how to plug AD derivatives into <code><a href="https://rdrr.io/r/
 <span><span class="co"># nlminb() with AD gradient + Hessian</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb</a></span><span class="op">(</span><span class="va">start</span>, objective <span class="op">=</span> <span class="va">nll</span>, gradient <span class="op">=</span> <span class="va">ngr</span>, hessian <span class="op">=</span> <span class="va">nhess</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Sign convention:</strong> Both <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> and
-<code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code> <strong>minimize</strong>. For MLE (maximizing the
-log-likelihood), negate everything:</p>
+<code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code> <strong>minimize</strong>. For maximization (e.g.,
+MLE), negate everything:</p>
 <ul>
-<li><code>fn = function(theta) -loglik(theta)</code></li>
-<li><code>gr = function(theta) -score(loglik, theta)</code></li>
-<li><code>hessian = function(theta) -hessian(loglik, theta)</code></li>
+<li><code>fn = function(x) -f(x)</code></li>
+<li><code>gr = function(x) -gradient(f, x)</code></li>
+<li><code>hessian = function(x) -hessian(f, x)</code></li>
 </ul>
 <p><strong>Key difference between optimizers:</strong></p>
 <table class="table">
@@ -177,21 +180,21 @@ sufficient statistics:</p>
 <span><span class="va">sum_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">data_norm</span><span class="op">)</span></span>
 <span><span class="va">sum_x2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">data_norm</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ll_normal</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">mu</span> <span class="op">&lt;-</span> <span class="va">theta</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="va">sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">theta</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>  <span class="co"># unconstrained: theta[2] = log(sigma)</span></span>
+<span><span class="va">ll_normal</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">mu</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span>  <span class="va">sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>  <span class="co"># unconstrained: x[2] = log(sigma)</span></span>
 <span>  <span class="op">-</span><span class="va">n</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">sigma</span><span class="op">)</span> <span class="op">-</span> <span class="op">(</span><span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">sigma</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">sum_x2</span> <span class="op">-</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">mu</span> <span class="op">*</span> <span class="va">sum_x</span> <span class="op">+</span> <span class="va">n</span> <span class="op">*</span> <span class="va">mu</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><strong>Reparameterization.</strong> Because
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\sigma &gt; 0</annotation></semantics></math>,
 we optimize over
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mn>2</mn></msub><mo>=</mo><mo>log</mo><mi>σ</mi></mrow><annotation encoding="application/x-tex">\theta_2 = \log\sigma</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mo>log</mo><mi>σ</mi></mrow><annotation encoding="application/x-tex">x_2 = \log\sigma</annotation></semantics></math>
 so that the parameter space is fully unconstrained — a standard practice
-in MLE fitting. Without this, BFGS can step
+in optimization. Without this, BFGS can step
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>
 through zero, producing <code>NaN</code> from <code>log(sigma)</code>
 and causing divergence. The AD chain rule propagates through
-<code><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp()</a></code> automatically, so <code><a href="../reference/score.html">score()</a></code> and
+<code><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp()</a></code> automatically, so <code><a href="../reference/gradient.html">gradient()</a></code> and
 <code><a href="../reference/hessian.html">hessian()</a></code> return derivatives with respect to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>μ</mi><mo>,</mo><mo>log</mo><mi>σ</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(\mu, \log\sigma)</annotation></semantics></math>
 without any manual Jacobian adjustment.</p>
@@ -199,8 +202,8 @@ without any manual Jacobian adjustment.</p>
 the AD gradient:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Negated versions for minimization</span></span>
-<span><span class="va">nll</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">-</span><span class="fu">ll_normal</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span></span>
-<span><span class="va">ngr</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">-</span><span class="fu"><a href="../reference/score.html">score</a></span><span class="op">(</span><span class="va">ll_normal</span>, <span class="va">theta</span><span class="op">)</span></span>
+<span><span class="va">nll</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span><span class="fu">ll_normal</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">ngr</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span><span class="fu"><a href="../reference/gradient.html">gradient</a></span><span class="op">(</span><span class="va">ll_normal</span>, <span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Starting value: mu = 0, log(sigma) = 0 (i.e., sigma = 1)</span></span>
 <span><span class="va">start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span></span>
@@ -211,7 +214,7 @@ the AD gradient:</p>
 <span><span class="co"># With AD gradient</span></span>
 <span><span class="va">fit_ad_gr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim</a></span><span class="op">(</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">nll</span>, gr <span class="op">=</span> <span class="va">ngr</span>, method <span class="op">=</span> <span class="st">"BFGS"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Compare (transform theta[2] back to sigma for display)</span></span>
+<span><span class="co"># Compare (transform x[2] back to sigma for display)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BFGS (no gradient)"</span>, <span class="st">"BFGS (AD gradient)"</span><span class="op">)</span>,</span>
 <span>  mu <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">fit_no_gr</span><span class="op">$</span><span class="va">par</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">fit_ad_gr</span><span class="op">$</span><span class="va">par</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
@@ -223,8 +226,8 @@ the AD gradient:</p>
 <span><span class="co">#&gt;               method       mu    sigma fn_calls gr_calls convergence</span></span>
 <span><span class="co">#&gt; 1 BFGS (no gradient) 5.065079 2.072403       39       16           0</span></span>
 <span><span class="co">#&gt; 2 BFGS (AD gradient) 5.065088 2.072401       39       16           0</span></span></code></pre></div>
-<p>Both reach the same MLE, but the AD gradient version typically uses
-fewer function evaluations because it has exact gradient
+<p>Both reach the same optimum, but the AD gradient version typically
+uses fewer function evaluations because it has exact gradient
 information.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Verify against analytical MLE</span></span>
@@ -244,7 +247,7 @@ information.</p>
 <strong>Hessian function</strong> argument, making it the natural target
 for second-order AD:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nhess</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">-</span><span class="fu"><a href="../reference/hessian.html">hessian</a></span><span class="op">(</span><span class="va">ll_normal</span>, <span class="va">theta</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">nhess</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span><span class="fu"><a href="../reference/hessian.html">hessian</a></span><span class="op">(</span><span class="va">ll_normal</span>, <span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit_nlminb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb</a></span><span class="op">(</span><span class="va">start</span>,</span>
 <span>                     objective <span class="op">=</span> <span class="va">nll</span>,</span>
@@ -283,11 +286,11 @@ regression and compare with R’s <code><a href="https://rdrr.io/r/stats/glm.htm
 <span><span class="va">prob_true</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">eta_true</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n_lr</span>, <span class="fl">1</span>, <span class="va">prob_true</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Log-likelihood for dualr</span></span>
-<span><span class="va">ll_logistic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="co"># Log-likelihood for nabla</span></span>
+<span><span class="va">ll_logistic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dual_constant.html">dual_constant</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
 <span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n_lr</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">eta_i</span> <span class="op">&lt;-</span> <span class="va">theta</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">theta</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="va">theta</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span> <span class="op">*</span> <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="fl">3</span><span class="op">]</span></span>
+<span>    <span class="va">eta_i</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="va">x</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span> <span class="op">*</span> <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="fl">3</span><span class="op">]</span></span>
 <span>    <span class="va">result</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op">+</span> <span class="va">y</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">*</span> <span class="va">eta_i</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">eta_i</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span>  <span class="va">result</span></span>
@@ -300,8 +303,8 @@ regression and compare with R’s <code><a href="https://rdrr.io/r/stats/glm.htm
 <span><span class="op">}</span></span></code></pre></div>
 <p>Fit with <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> using the AD gradient:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nll_lr</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">-</span><span class="fu">ll_logistic_num</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span></span>
-<span><span class="va">ngr_lr</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">-</span><span class="fu"><a href="../reference/score.html">score</a></span><span class="op">(</span><span class="va">ll_logistic</span>, <span class="va">theta</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">nll_lr</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span><span class="fu">ll_logistic_num</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">ngr_lr</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span><span class="fu"><a href="../reference/gradient.html">gradient</a></span><span class="op">(</span><span class="va">ll_logistic</span>, <span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit_lr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, fn <span class="op">=</span> <span class="va">nll_lr</span>, gr <span class="op">=</span> <span class="va">ngr_lr</span>, method <span class="op">=</span> <span class="st">"BFGS"</span><span class="op">)</span></span></code></pre></div>
 <p>Compare with <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>:</p>
@@ -326,12 +329,11 @@ regression and compare with R’s <code><a href="https://rdrr.io/r/stats/glm.htm
 <h2 id="standard-errors-from-the-hessian">Standard errors from the Hessian<a class="anchor" aria-label="anchor" href="#standard-errors-from-the-hessian"></a>
 </h2>
 <p>After optimization, the observed information matrix (negative Hessian
-at the MLE) provides the asymptotic variance-covariance matrix of the
-estimator:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Var</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><mi>I</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><mi>H</mi><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\text{Var}(\hat\theta) \approx I(\hat\theta)^{-1} = [-H(\hat\theta)]^{-1}</annotation></semantics></math></p>
+at the optimum) provides the asymptotic variance-covariance matrix:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Var</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>≈</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><mi>H</mi><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\text{Var}(\hat\theta) \approx [-H(\hat\theta)]^{-1}</annotation></semantics></math></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Observed information at the MLE</span></span>
-<span><span class="va">obs_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/observed_information.html">observed_information</a></span><span class="op">(</span><span class="va">ll_logistic</span>, <span class="va">fit_lr</span><span class="op">$</span><span class="va">par</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Observed information at the optimum (negative Hessian)</span></span>
+<span><span class="va">obs_info</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fu"><a href="../reference/hessian.html">hessian</a></span><span class="op">(</span><span class="va">ll_logistic</span>, <span class="va">fit_lr</span><span class="op">$</span><span class="va">par</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Variance-covariance matrix</span></span>
 <span><span class="va">vcov_ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">obs_info</span><span class="op">)</span></span>
@@ -396,9 +398,9 @@ tracking the negative log-likelihood at each step:</p>
 <span></span>
 <span><span class="co"># Helper: collect iterates via BFGS</span></span>
 <span><span class="va">bfgs_trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">bfgs_nll</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">bfgs_trace</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bfgs_trace</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1L</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;&lt;-</span> <span class="va">theta</span></span>
-<span>  <span class="op">-</span><span class="fu">ll_normal</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span></span>
+<span><span class="va">bfgs_nll</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">bfgs_trace</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bfgs_trace</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1L</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;&lt;-</span> <span class="va">x</span></span>
+<span>  <span class="op">-</span><span class="fu">ll_normal</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">bfgs_trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim</a></span><span class="op">(</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">bfgs_nll</span>, gr <span class="op">=</span> <span class="va">ngr</span>, method <span class="op">=</span> <span class="st">"BFGS"</span><span class="op">)</span></span>
@@ -421,9 +423,9 @@ tracking the negative log-likelihood at each step:</p>
 <span></span>
 <span><span class="co"># Helper: collect iterates via Nelder-Mead</span></span>
 <span><span class="va">nm_trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">nm_nll</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">nm_trace</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nm_trace</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1L</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;&lt;-</span> <span class="va">theta</span></span>
-<span>  <span class="op">-</span><span class="fu">ll_normal</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span></span>
+<span><span class="va">nm_nll</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">nm_trace</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nm_trace</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1L</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;&lt;-</span> <span class="va">x</span></span>
+<span>  <span class="op">-</span><span class="fu">ll_normal</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">nm_trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim</a></span><span class="op">(</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">nm_nll</span>, method <span class="op">=</span> <span class="st">"Nelder-Mead"</span>,</span>
@@ -447,9 +449,9 @@ tracking the negative log-likelihood at each step:</p>
 <span></span>
 <span><span class="co"># Helper: collect iterates via nlminb</span></span>
 <span><span class="va">nlm_trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">nlm_nll</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">nlm_trace</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nlm_trace</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1L</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;&lt;-</span> <span class="va">theta</span></span>
-<span>  <span class="op">-</span><span class="fu">ll_normal</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span></span>
+<span><span class="va">nlm_nll</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">nlm_trace</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nlm_trace</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1L</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;&lt;-</span> <span class="va">x</span></span>
+<span>  <span class="op">-</span><span class="fu">ll_normal</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">nlm_trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb</a></span><span class="op">(</span><span class="va">start</span>, objective <span class="op">=</span> <span class="va">nlm_nll</span>, gradient <span class="op">=</span> <span class="va">ngr</span>, hessian <span class="op">=</span> <span class="va">nhess</span><span class="op">)</span></span>
@@ -536,7 +538,7 @@ optimum.</p>
 <tbody>
 <tr class="odd">
 <td>Gradient</td>
-<td><code>score(loglik, theta)</code></td>
+<td><code>gradient(f, x)</code></td>
 <td>
 <code>gr</code> in <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code>, <code>gradient</code> in
 <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code>
@@ -544,13 +546,13 @@ optimum.</p>
 </tr>
 <tr class="even">
 <td>Hessian</td>
-<td><code>hessian(loglik, theta)</code></td>
+<td><code>hessian(f, x)</code></td>
 <td>
 <code>hessian</code> in <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code> only</td>
 </tr>
 <tr class="odd">
 <td>Observed information</td>
-<td><code>observed_information(loglik, theta)</code></td>
+<td><code>-hessian(f, x)</code></td>
 <td>Post-optimization: invert for SEs</td>
 </tr>
 </tbody>
@@ -559,7 +561,7 @@ optimum.</p>
 <ul>
 <li>
 <strong><code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> with BFGS</strong> — good default; use
-<code>gr = function(theta) -score(ll, theta)</code>
+<code>gr = function(x) -gradient(f, x)</code>
 </li>
 <li>
 <strong><code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code></strong> — when you want second-order
@@ -568,8 +570,8 @@ convergence; supply both gradient and Hessian</li>
 <strong>Nelder-Mead</strong> — fallback for non-smooth objectives;
 doesn’t benefit from AD</li>
 </ul>
-<p><strong>Remember the sign convention:</strong> optimizers minimize,
-MLE maximizes. Negate the log-likelihood, score, and Hessian when
+<p><strong>Remember the sign convention:</strong> optimizers minimize.
+For maximization, negate the function, gradient, and Hessian when
 passing to the optimizer.</p>
 </div>
   </div>

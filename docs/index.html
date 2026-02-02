@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Forward-Mode Automatic Differentiation via Dual Numbers • dualr</title>
+<title>Exact Derivatives via Automatic Differentiation • nabla</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Forward-Mode Automatic Differentiation via Dual Numbers">
-<meta property="og:description" content="Implements forward-mode automatic differentiation using dual numbers with S4 classes. Supports first- and second-order derivatives through nested duals, with convenience functions for maximum likelihood estimation workflows including score vectors, Hessian matrices, and observed information.">
+<script src="pkgdown.js"></script><meta property="og:title" content="Exact Derivatives via Automatic Differentiation">
+<meta property="og:description" content="Exact automatic differentiation for R functions. Provides a composable derivative operator D that computes gradients, Hessians, Jacobians, and arbitrary-order derivative tensors at machine precision. D(D(f)) gives Hessians, D(D(D(f))) gives third-order tensors for skewness of MLEs, and so on to any order. Works through any R code including loops, branches, and control flow.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -32,8 +32,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">dualr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
+        <a class="navbar-link" href="index.html">nabla</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.0</span>
       </span>
     </div>
 
@@ -53,10 +53,13 @@
       <a href="articles/higher-order.html">Higher-Order Derivatives</a>
     </li>
     <li>
-      <a href="articles/introduction.html">Introduction to dualr</a>
+      <a href="articles/introduction.html">Introduction to nabla</a>
     </li>
     <li>
-      <a href="articles/mle-workflow.html">MLE Workflow with dualr</a>
+      <a href="articles/mle-skewness.html">Higher-Order MLE Analysis</a>
+    </li>
+    <li>
+      <a href="articles/mle-workflow.html">Gradient and Hessian Computation with nabla</a>
     </li>
     <li>
       <a href="articles/optimizer-integration.html">Optimizer Integration</a>
@@ -69,7 +72,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/queelius/dualr/" class="external-link">
+  <a href="https://github.com/queelius/nabla/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
 
   </a>
@@ -87,17 +90,26 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="dualr-">dualr <img src="reference/figures/logo.png" align="right" height="139" alt=""><a class="anchor" aria-label="anchor" href="#dualr-"></a>
+<div class="page-header"><h1 id="nabla-">nabla <img src="reference/figures/logo.png" align="right" height="139" alt=""><a class="anchor" aria-label="anchor" href="#nabla-"></a>
 </h1></div>
 <blockquote>
-<p>Forward-Mode Automatic Differentiation via Dual Numbers</p>
+<p>Arbitrary-order exact derivatives at machine precision</p>
 </blockquote>
 <!-- badges: start -->
 
+<p><code>nabla</code> provides a single composable operator <code>D</code> that differentiates any R function to any order — exactly, at machine precision, through loops, branches, and all control flow:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/queelius/nabla" class="external-link">nabla</a></span><span class="op">)</span></span>
+<span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/D.html">D</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span>                <span class="co"># gradient</span></span>
+<span><span class="fu"><a href="reference/D.html">D</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, order <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>     <span class="co"># Hessian</span></span>
+<span><span class="fu"><a href="reference/D.html">D</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, order <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>     <span class="co"># 2×2×2 third-order tensor</span></span>
+<span><span class="fu"><a href="reference/D.html">D</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, order <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>     <span class="co"># 2×2×2×2 fourth-order tensor</span></span></code></pre></div>
+<p>Each application of <code>D</code> adds one dimension to the output. <code>D(D(f))</code> gives the Hessian, <code>D(D(D(f)))</code> gives the third-order tensor, and so on — no limit on order, no loss of precision, no symbolic algebra.</p>
 <div class="section level2">
-<h2 id="why-automatic-differentiation">Why automatic differentiation?<a class="anchor" aria-label="anchor" href="#why-automatic-differentiation"></a>
+<h2 id="why-nabla">Why nabla?<a class="anchor" aria-label="anchor" href="#why-nabla"></a>
 </h2>
-<p>Computing derivatives is fundamental to optimization, statistics, and scientific computing. The three main approaches are:</p>
 <table class="table">
 <colgroup>
 <col width="25%">
@@ -109,88 +121,71 @@
 <th></th>
 <th><strong>Finite Differences</strong></th>
 <th><strong>Symbolic Diff</strong></th>
-<th><strong>AD (dualr)</strong></th>
+<th><strong>AD (nabla)</strong></th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td><strong>Accuracy</strong></td>
 <td>O(h) or O(h²) truncation error</td>
 <td>Exact</td>
-<td>Exact (machine precision)</td>
+<td><strong>Exact (machine precision)</strong></td>
 </tr>
 <tr class="even">
-<td><strong>Cost</strong></td>
-<td>2p function evaluations</td>
-<td>Expression swell for complex f</td>
-<td>p forward passes</td>
+<td><strong>Higher-order</strong></td>
+<td>Error compounds rapidly</td>
+<td>Expression swell</td>
+<td><strong>Composes cleanly to any order</strong></td>
 </tr>
 <tr class="odd">
 <td><strong>Control flow</strong></td>
 <td>Works</td>
 <td>Breaks on if/for/while</td>
-<td>Works through any code</td>
-</tr>
-<tr class="even">
-<td><strong>Implementation</strong></td>
-<td>Easy</td>
-<td>Requires CAS</td>
-<td>Operator overloading</td>
+<td><strong>Works through any code</strong></td>
 </tr>
 </tbody>
 </table>
-<p>Finite differences are inaccurate for ill-conditioned problems. Symbolic differentiation suffers from expression swell and cannot handle control flow. <strong>Automatic differentiation</strong> gives exact derivatives at machine precision through any R code — loops, branches, and all.</p>
+<p>Finite differences lose precision at higher orders (each order multiplies the error). Symbolic differentiation suffers from expression swell. <code>nabla</code> composes <code>D</code> via nested dual numbers — each order is as precise as the first.</p>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Install from CRAN</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"nabla"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Or install development version from GitHub</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"queelius/nabla"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="the-d-operator">The <code>D</code> operator<a class="anchor" aria-label="anchor" href="#the-d-operator"></a>
+</h2>
+<p><code>D</code> is the core of <code>nabla</code>. It differentiates any function <code>f</code> and returns a new function — which can itself be differentiated:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span> <span class="op">*</span> <span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">Df</span>   <span class="op">&lt;-</span> <span class="fu"><a href="reference/D.html">D</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span>          <span class="co"># first derivative (function)</span></span>
+<span><span class="va">DDf</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/D.html">D</a></span><span class="op">(</span><span class="va">Df</span><span class="op">)</span>         <span class="co"># second derivative (function)</span></span>
+<span><span class="va">DDDf</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/D.html">D</a></span><span class="op">(</span><span class="va">DDf</span><span class="op">)</span>        <span class="co"># third derivative (function)</span></span>
+<span></span>
+<span><span class="fu">Df</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>           <span class="co"># gradient vector</span></span>
+<span><span class="fu">DDf</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>          <span class="co"># Hessian matrix</span></span>
+<span><span class="fu">DDDf</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>         <span class="co"># 2×2×2 tensor</span></span></code></pre></div>
+<p>Equivalently, evaluate directly at a point:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/D.html">D</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>              <span class="co"># gradient</span></span>
+<span><span class="fu"><a href="reference/D.html">D</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>, order <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>   <span class="co"># Hessian</span></span>
+<span><span class="fu"><a href="reference/D.html">D</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>, order <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>   <span class="co"># third-order tensor</span></span></code></pre></div>
+<p><code><a href="reference/gradient.html">gradient()</a></code>, <code><a href="reference/hessian.html">hessian()</a></code>, and <code><a href="reference/jacobian.html">jacobian()</a></code> are convenience wrappers:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/gradient.html">gradient</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>       <span class="co"># == D(f, c(3, 4))</span></span>
+<span><span class="fu"><a href="reference/hessian.html">hessian</a></span><span class="op">(</span><span class="va">f</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>        <span class="co"># == D(f, c(3, 4), order = 2)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
 </h2>
 <p>A dual number extends the reals with an infinitesimal ε where ε² = 0:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>+</mo><mi>ε</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>f</mi><mi>′</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="0.167em"></mspace><mi>ε</mi></mrow><annotation encoding="application/x-tex">f(x + \varepsilon) = f(x) + f'(x)\,\varepsilon</annotation></semantics></math></p>
-<p>By propagating ε through every arithmetic operation and math function, <code>dualr</code> computes f(x) and f’(x) simultaneously in a single forward pass. No symbolic manipulation, no finite step sizes — just exact derivatives via the algebra of dual numbers.</p>
-</div>
-<div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h2>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install from CRAN</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"dualr"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Or install development version from GitHub</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"queelius/dualr"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
-</h2>
-<p><strong>Single variable derivative:</strong></p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/queelius/dualr" class="external-link">dualr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create a dual variable at x = 2 (seeds derivative tracking)</span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dual_variable.html">dual_variable</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Evaluate any expression — derivatives propagate automatically</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">^</span><span class="fl">3</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/value.html">value</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>   <span class="co"># f(2) = 8.909</span></span>
-<span><span class="fu"><a href="reference/deriv.html">deriv</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>   <span class="co"># f'(2) = 3*4 + cos(2) = 11.584</span></span></code></pre></div>
-<p><strong>Multi-parameter score and Hessian (for MLE):</strong></p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Poisson log-likelihood using sufficient statistics</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">100</span>, lambda <span class="op">=</span> <span class="fl">3.5</span><span class="op">)</span></span>
-<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="va">sum_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">ll</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">lambda</span> <span class="op">&lt;-</span> <span class="va">theta</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="va">sum_x</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span> <span class="op">-</span> <span class="va">n</span> <span class="op">*</span> <span class="va">lambda</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="co"># Gradient (score vector) — one call, exact result</span></span>
-<span><span class="fu"><a href="reference/score.html">score</a></span><span class="op">(</span><span class="va">ll</span>, <span class="fl">3.0</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Hessian matrix — exact second derivatives via nested duals</span></span>
-<span><span class="fu"><a href="reference/hessian.html">hessian</a></span><span class="op">(</span><span class="va">ll</span>, <span class="fl">3.0</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Observed information = -Hessian</span></span>
-<span><span class="fu"><a href="reference/observed_information.html">observed_information</a></span><span class="op">(</span><span class="va">ll</span>, <span class="fl">3.0</span><span class="op">)</span></span></code></pre></div>
+<p>For higher orders, <code>nabla</code> nests dual numbers: a dual whose components are themselves duals. Each level of nesting extracts one additional order of derivative — so <code>D(D(D(f)))</code> propagates through triply-nested duals to produce exact third derivatives. This works through <code>lgamma</code>, <code>psigamma</code>, trig functions, and all of R’s math — no special cases needed.</p>
 </div>
 <div class="section level2">
 <h2 id="use-cases">Use cases<a class="anchor" aria-label="anchor" href="#use-cases"></a>
@@ -200,28 +195,30 @@
 <strong>Optimization</strong> — supply exact gradients to <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> and <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code>
 </li>
 <li>
-<strong>Maximum likelihood estimation</strong> — score vectors, Hessians, and standard errors</li>
+<strong>Maximum likelihood</strong> — Hessians for standard errors, third-order tensors for asymptotic skewness of MLEs</li>
 <li>
 <strong>Sensitivity analysis</strong> — how outputs change with respect to inputs</li>
 <li>
-<strong>Taylor approximation</strong> — compute polynomial approximations with exact coefficients</li>
+<strong>Taylor approximation</strong> — exact coefficients to any order</li>
 <li>
-<strong>Curvature analysis</strong> — second-order geometric properties of curves</li>
+<strong>Curvature analysis</strong> — second-order geometric properties</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="vignettes">Vignettes<a class="anchor" aria-label="anchor" href="#vignettes"></a>
 </h2>
-<!-- Links work on the pkgdown site; use browseVignettes("dualr") locally -->
+<!-- Links work on the pkgdown site; use browseVignettes("nabla") locally -->
 <ul>
 <li>
-<a href="articles/introduction.html">Introduction to dualr</a> — dual numbers, arithmetic, composition, comparison with finite differences</li>
+<a href="articles/introduction.html">Introduction to nabla</a> — dual numbers, arithmetic, composition, comparison with finite differences</li>
 <li>
-<a href="articles/mle-workflow.html">MLE Workflow</a> — score, Hessian, observed information, Newton-Raphson on statistical models</li>
+<a href="articles/mle-workflow.html">MLE Workflow</a> — gradient, Hessian, Newton-Raphson on statistical models</li>
 <li>
-<a href="articles/higher-order.html">Higher-Order Derivatives</a> — nested duals, curvature, Taylor expansion</li>
+<a href="articles/higher-order.html">Higher-Order Derivatives</a> — the <code>D</code> operator, curvature, Taylor expansion</li>
 <li>
-<a href="articles/optimizer-integration.html">Optimizer Integration</a> — using <code><a href="reference/score.html">score()</a></code> and <code><a href="reference/hessian.html">hessian()</a></code> with <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> and <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code>
+<a href="articles/mle-skewness.html">Higher-Order MLE Analysis</a> — third-order derivative tensors and asymptotic skewness of MLEs</li>
+<li>
+<a href="articles/optimizer-integration.html">Optimizer Integration</a> — using <code><a href="reference/gradient.html">gradient()</a></code> and <code><a href="reference/hessian.html">hessian()</a></code> with <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> and <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code>
 </li>
 </ul>
 </div>
@@ -237,8 +234,8 @@
     <div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/queelius/dualr/" class="external-link">Browse source code</a></li>
-<li><a href="https://github.com/queelius/dualr/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/queelius/nabla/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/queelius/nabla/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -255,7 +252,7 @@
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html#citation">Citing dualr</a></li>
+<li><a href="authors.html#citation">Citing nabla</a></li>
 </ul>
 </div>
 
@@ -269,8 +266,8 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://CRAN.R-project.org/package=dualr" class="external-link"><img src="https://www.r-pkg.org/badges/version/dualr" alt="CRAN status"></a></li>
-<li><a href="https://github.com/queelius/dualr/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/queelius/dualr/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://CRAN.R-project.org/package=nabla" class="external-link"><img src="https://www.r-pkg.org/badges/version/nabla" alt="CRAN status"></a></li>
+<li><a href="https://github.com/queelius/nabla/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/queelius/nabla/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
 
