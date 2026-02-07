@@ -85,14 +85,12 @@ calculus rules (sum, product, quotient, power, chain).
 x <- dual_variable(3)
 y <- dual_variable(4)
 
-# Arithmetic
-value(x + y)   # 7
-deriv(x * x)   # 6 (= 2 * 3)
-value(x^2)     # 9
-deriv(x^2)     # 6
+value(x + y)
+deriv(x * x)
+value(x^2)
+deriv(x^2)
 
-# Comparison (uses values only)
-x < y   # TRUE
-x == y  # FALSE
+x < y
+x == y
 
 }

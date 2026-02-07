@@ -19,13 +19,13 @@
 #'
 #' @examples
 #' x <- dual_variable(pi / 4)
-#' value(sin(x))  # sin(pi/4)
-#' deriv(sin(x))  # cos(pi/4)
+#' value(sin(x))
+#' deriv(sin(x))
 #'
 #' y <- dual_variable(2)
-#' value(exp(y))  # exp(2)
-#' deriv(exp(y))  # exp(2)
-#' deriv(log(y))  # 1/2
+#' value(exp(y))
+#' deriv(exp(y))
+#' deriv(log(y))
 #'
 #' @name dual-math
 #' @aliases Math,dualr-method
@@ -139,8 +139,8 @@ setMethod("Math", "dualr", function(x) {
 #'
 #' @examples
 #' x <- dual_variable(3.14159)
-#' value(round(x, 2))  # 3.14
-#' deriv(round(x, 2))  # 0 (piecewise constant)
+#' value(round(x, 2))
+#' deriv(round(x, 2))
 #'
 #' @name dual-math2
 #' @aliases Math2,dualr-method
@@ -168,7 +168,7 @@ setMethod("Math2", "dualr", function(x, digits) {
 #' y <- dual_variable(1)
 #' x <- dual_constant(1)
 #' result <- atan2(y, x)
-#' value(result)  # pi/4
+#' value(result)
 #'
 #' @name dual-atan2
 #' @aliases atan2,dualr,dualr-method atan2,dualr,numeric-method atan2,numeric,dualr-method
@@ -212,8 +212,8 @@ setMethod("atan2", signature(y = "numeric", x = "dualr"), function(y, x) {
 #' @examples
 #' x <- dual_variable(3)
 #' y <- dual_variable(5)
-#' value(max(x, y))  # 5
-#' value(min(x, y))  # 3
+#' value(max(x, y))
+#' value(min(x, y))
 #'
 #' @name dual-maxmin
 #' @aliases max,dualr-method min,dualr-method
@@ -246,8 +246,8 @@ setMethod("min", signature(x = "dualr"), function(x, ..., na.rm = FALSE) {
 #' @return A \code{dual} representing \code{log(x, base)}.
 #' @examples
 #' x <- dual_variable(8)
-#' value(log(x, base = 2))  # 3
-#' deriv(log(x, base = 2))  # 1 / (8 * log(2))
+#' value(log(x, base = 2))
+#' deriv(log(x, base = 2))
 #'
 #' @name dual-log
 #' @aliases log,dualr-method

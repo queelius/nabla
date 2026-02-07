@@ -26,7 +26,7 @@ Indexing and length for dual_vector
 }
 \examples{
 dv <- dual_vector(dual(10, 1), dual(20, 0), dual(30, 0))
-value(dv[1])   # 10
-length(dv)     # 3
+value(dv[1])
+length(dv)
 
 }

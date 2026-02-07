@@ -30,7 +30,7 @@
 #' @export
 #' @examples
 #' f <- function(x) -(x[1] - 3)^2 - (x[2] - 5)^2
-#' gradient(f, c(1, 2))  # c(4, 6)
+#' gradient(f, c(1, 2))
 gradient <- function(f, x) {
   D(f, x, order = 1L)
 }
@@ -46,7 +46,7 @@ gradient <- function(f, x) {
 #' @export
 #' @examples
 #' f <- function(x) -(x[1] - 3)^2 - (x[2] - 5)^2
-#' hessian(f, c(1, 2))  # diag(c(-2, -2))
+#' hessian(f, c(1, 2))
 hessian <- function(f, x) {
   D(f, x, order = 2L)
 }
@@ -65,16 +65,14 @@ hessian <- function(f, x) {
 #'   a numeric vector of length \code{p} for scalar-valued \code{f}.
 #' @export
 #' @examples
-#' # Jacobian of f: R^2 -> R^3
 #' f <- function(x) {
 #'   a <- x[1]; b <- x[2]
 #'   list(a * b, a^2, sin(b))
 #' }
 #' jacobian(f, c(2, pi/4))
 #'
-#' # Scalar function: returns gradient vector
 #' g <- function(x) x[1]^2 + x[2]^2
-#' jacobian(g, c(3, 4))  # c(6, 8)
+#' jacobian(g, c(3, 4))
 jacobian <- function(f, x) {
   D(f, x, order = 1L)
 }
@@ -165,16 +163,15 @@ jacobian <- function(f, x) {
 #' @export
 #' @examples
 #' f <- function(x) x[1]^2 * x[2]
-#' D(f, c(3, 4))                     # gradient: c(24, 9)
-#' D(f, c(3, 4), order = 2)          # Hessian matrix
+#' D(f, c(3, 4))
+#' D(f, c(3, 4), order = 2)
 #'
 #' g <- function(x) list(x[1] * x[2], x[1]^2)
-#' D(g, c(2, 3))                     # 2x2 Jacobian
+#' D(g, c(2, 3))
 #'
-#' # Composition: D(D(f)) == D(f, order = 2)
 #' Df <- D(f)
 #' DDf <- D(Df)
-#' DDf(c(3, 4))                      # same as D(f, c(3,4), order=2)
+#' DDf(c(3, 4))
 D <- function(f, x = NULL, order = 1L) {
   order <- as.integer(order)
   if (order < 1L) stop("order must be a positive integer")

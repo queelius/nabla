@@ -19,6 +19,6 @@ and \code{length()}, so that user functions can use natural
 }
 \examples{
 dv <- dual_vector(dual(1, 0), dual(2, 1))
-length(dv)  # 2
-value(dv[1])  # 1
+length(dv)
+value(dv[1])
 }

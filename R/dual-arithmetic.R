@@ -13,15 +13,13 @@
 #' x <- dual_variable(3)
 #' y <- dual_variable(4)
 #'
-#' # Arithmetic
-#' value(x + y)   # 7
-#' deriv(x * x)   # 6 (= 2 * 3)
-#' value(x^2)     # 9
-#' deriv(x^2)     # 6
+#' value(x + y)
+#' deriv(x * x)
+#' value(x^2)
+#' deriv(x^2)
 #'
-#' # Comparison (uses values only)
-#' x < y   # TRUE
-#' x == y  # FALSE
+#' x < y
+#' x == y
 #'
 #' @name dual-arithmetic
 #' @aliases Ops,dualr,dualr-method Ops,dualr,numeric-method Ops,numeric,dualr-method
@@ -242,8 +240,8 @@ setMethod("!", signature(x = "dualr"), function(x) !x@value)
 #' @examples
 #' x <- dual_variable(2)
 #' y <- dual_variable(5)
-#' value(sum(x, y))   # 7
-#' value(prod(x, y))  # 10
+#' value(sum(x, y))
+#' value(prod(x, y))
 #'
 #' @name dual-summary
 #' @aliases Summary,dualr-method

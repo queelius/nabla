@@ -23,14 +23,12 @@ AD. Equivalent to \code{D(f, x)}. For \code{f: R^p -> R^m}, returns an
 gradient vector.
 }
 \examples{
-# Jacobian of f: R^2 -> R^3
 f <- function(x) {
   a <- x[1]; b <- x[2]
   list(a * b, a^2, sin(b))
 }
 jacobian(f, c(2, pi/4))
 
-# Scalar function: returns gradient vector
 g <- function(x) x[1]^2 + x[2]^2
-jacobian(g, c(3, 4))  # c(6, 8)
+jacobian(g, c(3, 4))
 }

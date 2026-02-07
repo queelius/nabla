@@ -21,7 +21,7 @@ piecewise constant functions, so the derivative is zero almost everywhere.
 }
 \examples{
 x <- dual_variable(3.14159)
-value(round(x, 2))  # 3.14
-deriv(round(x, 2))  # 0 (piecewise constant)
+value(round(x, 2))
+deriv(round(x, 2))
 
 }

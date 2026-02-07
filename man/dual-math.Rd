@@ -35,12 +35,12 @@ Supported functions: \code{abs}, \code{sign}, \code{sqrt}, \code{floor},
 }
 \examples{
 x <- dual_variable(pi / 4)
-value(sin(x))  # sin(pi/4)
-deriv(sin(x))  # cos(pi/4)
+value(sin(x))
+deriv(sin(x))
 
 y <- dual_variable(2)
-value(exp(y))  # exp(2)
-deriv(exp(y))  # exp(2)
-deriv(log(y))  # 1/2
+value(exp(y))
+deriv(exp(y))
+deriv(log(y))
 
 }

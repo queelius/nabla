@@ -23,8 +23,8 @@ derivative from 0 (the function value) up to the seeded order.
 \examples{
 x <- dual_variable_n(1, order = 3)
 r <- exp(x)
-deriv_n(r, 0)  # exp(1) = 2.718...
-deriv_n(r, 1)  # exp(1)
-deriv_n(r, 2)  # exp(1)
-deriv_n(r, 3)  # exp(1)
+deriv_n(r, 0)
+deriv_n(r, 1)
+deriv_n(r, 2)
+deriv_n(r, 3)
 }

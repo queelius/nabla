@@ -26,5 +26,5 @@ parameters. This is compatible with the standard R convention used by
 }
 \examples{
 f <- function(x) -(x[1] - 3)^2 - (x[2] - 5)^2
-gradient(f, c(1, 2))  # c(4, 6)
+gradient(f, c(1, 2))
 }

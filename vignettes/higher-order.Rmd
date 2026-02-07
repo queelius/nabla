@@ -110,7 +110,7 @@ xs_curve <- seq(0, 2 * pi, length.out = 200)
 sin_vals <- sin(xs_curve)
 kappa_vals <- sapply(xs_curve, function(x) curvature(sin_f, x))
 
-par(mar = c(4, 4.5, 2, 4.5))
+oldpar <- par(mar = c(4, 4.5, 2, 4.5))
 plot(xs_curve, sin_vals, type = "l", col = "steelblue", lwd = 2,
      xlab = "x", ylab = "sin(x)",
      main = "sin(x) and its curvature")
@@ -124,6 +124,7 @@ legend("bottom",
        legend = c("sin(x)", expression(kappa(x))),
        col = c("steelblue", "firebrick"), lty = c(1, 2), lwd = 2,
        bty = "n", horiz = TRUE)
+par(oldpar)
 ```
 
 The curvature reaches its maximum of 1.0 at $x = \pi/2$ (where $\sin'(x) = 0$
@@ -170,7 +171,7 @@ xs_plot <- seq(-2, 3, length.out = 300)
 exact_vals <- exp(xs_plot)
 taylor_vals <- sapply(xs_plot, function(x) taylor2(f_exp, 0, x))
 
-par(mar = c(4, 4, 2, 1))
+oldpar <- par(mar = c(4, 4, 2, 1))
 plot(xs_plot, exact_vals, type = "l", col = "steelblue", lwd = 2,
      xlab = "x", ylab = "y",
      main = expression("exp(x) vs 2nd-order Taylor at " * x[0] == 0),
@@ -182,6 +183,7 @@ legend("topleft",
        legend = c("exp(x)", expression("Taylor " * T[2](x))),
        col = c("steelblue", "firebrick"), lty = c(1, 2), lwd = 2,
        bty = "n")
+par(oldpar)
 ```
 
 The Taylor polynomial matches `exp(x)` closely near $x_0 = 0$ but diverges

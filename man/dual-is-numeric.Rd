@@ -17,6 +17,6 @@
 Returns \code{TRUE} for dual numbers so that defensive type checks pass.
 }
 \examples{
-is.numeric(dual(1, 0))  # TRUE
+is.numeric(dual(1, 0))
 
 }

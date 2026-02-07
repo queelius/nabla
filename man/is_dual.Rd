@@ -16,6 +16,6 @@ Logical.
 Test whether an object is a dual number
 }
 \examples{
-is_dual(dual(1, 0))  # TRUE
-is_dual(42)           # FALSE
+is_dual(dual(1, 0))
+is_dual(42)
 }

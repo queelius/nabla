@@ -10,9 +10,9 @@
 #' @return The error function value. For dual input, returns a dual with
 #'   derivative \eqn{(2/\sqrt{\pi}) e^{-x^2}}.
 #' @examples
-#' erf(1)  # numeric
+#' erf(1)
 #' x <- dual_variable(1)
-#' value(erf(x))  # erf(1)
+#' value(erf(x))
 #' @export
 setGeneric("erf", function(x) standardGeneric("erf"))
 
@@ -36,9 +36,9 @@ setMethod("erf", "dualr", function(x) {
 #' @param x A numeric or dual value.
 #' @return The complementary error function value.
 #' @examples
-#' erfc(1)  # 1 - erf(1)
+#' erfc(1)
 #' x <- dual_variable(0)
-#' value(erfc(x))  # 1
+#' value(erfc(x))
 #' @export
 setGeneric("erfc", function(x) standardGeneric("erfc"))
 
@@ -63,9 +63,9 @@ setMethod("erfc", "dualr", function(x) {
 #' @param b A numeric or dual value.
 #' @return \code{lbeta(a, b)} with derivative via digamma.
 #' @examples
-#' lbeta(2, 3)  # log(beta(2, 3))
+#' lbeta(2, 3)
 #' a <- dual_variable(2)
-#' value(lbeta(a, 3))  # log(beta(2, 3))
+#' value(lbeta(a, 3))
 #' @export
 setGeneric("lbeta", function(a, b) standardGeneric("lbeta"))
 
@@ -115,7 +115,7 @@ setMethod("lbeta", signature(a = "numeric", b = "dualr"), function(a, b) {
 #' @return \code{beta(a, b)} with derivative.
 #' @aliases beta,ANY,ANY-method
 #' @examples
-#' beta(2, 3)  # 1/12
+#' beta(2, 3)
 #' a <- dual_variable(2)
 #' value(beta(a, 3))
 #' @export
@@ -144,9 +144,9 @@ setMethod("beta", signature(a = "ANY", b = "ANY"), function(a, b) {
 #' @param deriv Integer derivative order (0 = digamma, 1 = trigamma, etc.).
 #' @return The polygamma function value.
 #' @examples
-#' psigamma(1, deriv = 0)  # digamma(1)
+#' psigamma(1, deriv = 0)
 #' x <- dual_variable(2)
-#' value(psigamma(x, deriv = 1))  # trigamma(2)
+#' value(psigamma(x, deriv = 1))
 #' @export
 setGeneric("psigamma", function(x, deriv = 0L) standardGeneric("psigamma"))
 

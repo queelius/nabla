@@ -26,7 +26,7 @@ Compares on value and propagates the derivative of the selected branch.
 \examples{
 x <- dual_variable(3)
 y <- dual_variable(5)
-value(max(x, y))  # 5
-value(min(x, y))  # 3
+value(max(x, y))
+value(min(x, y))
 
 }

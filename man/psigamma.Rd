@@ -25,7 +25,7 @@ Computes \eqn{\psi^{(n)}(x)} where \eqn{n} is the derivative order.
 The derivative of \eqn{\psi^{(n)}(x)} is \eqn{\psi^{(n+1)}(x)}.
 }
 \examples{
-psigamma(1, deriv = 0)  # digamma(1)
+psigamma(1, deriv = 0)
 x <- dual_variable(2)
-value(psigamma(x, deriv = 1))  # trigamma(2)
+value(psigamma(x, deriv = 1))
 }

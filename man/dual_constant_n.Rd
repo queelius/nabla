@@ -21,7 +21,7 @@ variable at nesting depth \code{n}.
 }
 \examples{
 k <- dual_constant_n(5, order = 3)
-deriv_n(k, 1)  # 0
-deriv_n(k, 2)  # 0
-deriv_n(k, 3)  # 0
+deriv_n(k, 1)
+deriv_n(k, 2)
+deriv_n(k, 3)
 }

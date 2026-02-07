@@ -30,7 +30,7 @@ lbeta(a, b)
 Log-beta function for dual numbers
 }
 \examples{
-lbeta(2, 3)  # log(beta(2, 3))
+lbeta(2, 3)
 a <- dual_variable(2)
-value(lbeta(a, 3))  # log(beta(2, 3))
+value(lbeta(a, 3))
 }

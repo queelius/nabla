@@ -21,9 +21,9 @@ Display a dual number
 }
 \examples{
 x <- dual(3, 1)
-x  # prints: <dual: 3 + 1*e>
+x
 
 dv <- dual_vector(dual(1, 0), dual(2, 1))
-dv  # prints: <dual_vector: 2 elements>
+dv
 
 }

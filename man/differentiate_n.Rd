@@ -22,11 +22,5 @@ Evaluates \code{f} at a dual variable seeded for order \code{n},
 returning the function value and all derivatives from 1 to \code{n}.
 }
 \examples{
-# All derivatives of sin(x) at x = pi/4
 differentiate_n(sin, pi/4, order = 4)
-# $value = sin(pi/4)
-# $d1 = cos(pi/4)
-# $d2 = -sin(pi/4)
-# $d3 = -cos(pi/4)
-# $d4 = sin(pi/4)
 }

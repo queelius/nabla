@@ -23,7 +23,7 @@ derivative \eqn{(2/\sqrt{\pi}) e^{-x^2}}.
 Computes \eqn{\mathrm{erf}(x) = \frac{2}{\sqrt{\pi}} \int_0^x e^{-t^2} dt}.
 }
 \examples{
-erf(1)  # numeric
+erf(1)
 x <- dual_variable(1)
-value(erf(x))  # erf(1)
+value(erf(x))
 }

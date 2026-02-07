@@ -266,36 +266,34 @@ data.frame(
 # Contour plot with optimizer paths
 # Recompute paths by running each optimizer and collecting iterates
 
-# Helper: collect iterates via BFGS
-bfgs_trace <- list()
-bfgs_nll <- function(x) {
-  bfgs_trace[[length(bfgs_trace) + 1L]] <<- x
-  -ll_normal(x)
+# Helper: collect iterates using an environment (avoids <<-)
+make_tracer <- function(fn) {
+  env <- new.env(parent = emptyenv())
+  env$trace <- list()
+  list(
+    fn = function(x) {
+      env$trace[[length(env$trace) + 1L]] <- x
+      fn(x)
+    },
+    path = function() do.call(rbind, env$trace)
+  )
 }
-bfgs_trace <- list()
-optim(start, fn = bfgs_nll, gr = ngr, method = "BFGS")
-bfgs_path <- do.call(rbind, bfgs_trace)
 
-# Helper: collect iterates via Nelder-Mead
-nm_trace <- list()
-nm_nll <- function(x) {
-  nm_trace[[length(nm_trace) + 1L]] <<- x
-  -ll_normal(x)
-}
-nm_trace <- list()
-optim(start, fn = nm_nll, method = "Nelder-Mead",
+# Collect iterates via BFGS
+bfgs <- make_tracer(function(x) -ll_normal(x))
+optim(start, fn = bfgs$fn, gr = ngr, method = "BFGS")
+bfgs_path <- bfgs$path()
+
+# Collect iterates via Nelder-Mead
+nm <- make_tracer(function(x) -ll_normal(x))
+optim(start, fn = nm$fn, method = "Nelder-Mead",
       control = list(maxit = 200))
-nm_path <- do.call(rbind, nm_trace)
+nm_path <- nm$path()
 
-# Helper: collect iterates via nlminb
-nlm_trace <- list()
-nlm_nll <- function(x) {
-  nlm_trace[[length(nlm_trace) + 1L]] <<- x
-  -ll_normal(x)
-}
-nlm_trace <- list()
-nlminb(start, objective = nlm_nll, gradient = ngr, hessian = nhess)
-nlm_path <- do.call(rbind, nlm_trace)
+# Collect iterates via nlminb
+nlm <- make_tracer(function(x) -ll_normal(x))
+nlminb(start, objective = nlm$fn, gradient = ngr, hessian = nhess)
+nlm_path <- nlm$path()
 
 # Build contour grid
 mu_grid <- seq(-1, 7, length.out = 100)
@@ -309,7 +307,7 @@ bfgs_path[, 2] <- exp(bfgs_path[, 2])
 nm_path[, 2] <- exp(nm_path[, 2])
 nlm_path[, 2] <- exp(nlm_path[, 2])
 
-par(mar = c(4, 4, 2, 1))
+oldpar <- par(mar = c(4, 4, 2, 1))
 contour(mu_grid, sigma_grid, nll_surface, nlevels = 30,
         xlab = expression(mu), ylab = expression(sigma),
         main = "Optimizer paths on NLL contours",
@@ -336,6 +334,7 @@ legend("topright",
        col = c("coral", "steelblue", "forestgreen", "black"),
        lty = c(3, 1, 1, NA), pch = c(17, 19, 15, 3),
        lwd = c(1.5, 2, 2, 2), bty = "n", cex = 0.85)
+par(oldpar)
 ```
 
 Nelder-Mead (no derivatives) requires many more function evaluations and

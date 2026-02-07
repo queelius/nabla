@@ -252,7 +252,7 @@ gr_vals <- sapply(lam_grid, function(l) gradient(ll_poisson, l))
 
 mle_lam <- sum_x_pois / n_pois  # analytical MLE
 
-par(mar = c(4, 4.5, 2, 4.5))
+oldpar <- par(mar = c(4, 4.5, 2, 4.5))
 plot(lam_grid, ll_vals, type = "l", col = "steelblue", lwd = 2,
      xlab = expression(lambda), ylab = expression(ell(lambda)),
      main = "Poisson log-likelihood and gradient")
@@ -269,6 +269,7 @@ legend("topright",
        col = c("steelblue", "firebrick", "grey40"),
        lty = c(1, 2, 3), lwd = c(2, 2, 1), pch = c(NA, NA, 4),
        bty = "n")
+par(oldpar)
 ```
 
 The gradient crosses zero exactly at the MLE ($\hat\lambda = \bar{x}$),
@@ -434,13 +435,14 @@ ll_surface <- outer(mu_grid, sigma_grid, Vectorize(function(m, s) {
   ll_normal_2(c(m, s))
 }))
 
-par(mar = c(4, 4, 2, 1))
+oldpar <- par(mar = c(4, 4, 2, 1))
 contour(mu_grid, sigma_grid, ll_surface, nlevels = 25,
         xlab = expression(mu), ylab = expression(sigma),
         main = expression("Log-likelihood contours: Normal(" * mu * ", " * sigma * ")"),
         col = "steelblue")
 points(mle_mu, mle_sigma, pch = 3, col = "firebrick", cex = 2, lwd = 2)
 text(mle_mu + 0.15, mle_sigma, "MLE", col = "firebrick", cex = 0.9)
+par(oldpar)
 ```
 
 ### Newton-Raphson convergence path
@@ -465,7 +467,7 @@ newton_raphson_trace <- function(f, theta0, tol = 1e-8, max_iter = 50) {
 
 result_trace <- newton_raphson_trace(ll_normal_2, c(3, 1))
 
-par(mar = c(4, 4, 2, 1))
+oldpar <- par(mar = c(4, 4, 2, 1))
 contour(mu_grid, sigma_grid, ll_surface, nlevels = 25,
         xlab = expression(mu), ylab = expression(sigma),
         main = "Newton-Raphson convergence path",
@@ -480,6 +482,7 @@ legend("topright",
        col = c("firebrick", "orange", "steelblue"),
        pch = c(19, 17, 3), lty = c(1, NA, NA), lwd = c(2, NA, 2),
        bty = "n")
+par(oldpar)
 ```
 
 Newton-Raphson converges in `r result_trace$iterations` iterations — the

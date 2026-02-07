@@ -24,6 +24,6 @@ Combine dual numbers into a dual_vector
 x <- dual_variable(1)
 y <- dual_variable(2)
 dv <- c(x, y)
-length(dv)  # 2
+length(dv)
 
 }

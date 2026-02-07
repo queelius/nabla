@@ -74,7 +74,7 @@ fpx <- sapply(xs, function(xi) D(f, xi))
 # Mark the evaluation point x = pi/4
 x_mark <- pi / 4
 
-par(mar = c(4, 4, 2, 1))
+oldpar <- par(mar = c(4, 4, 2, 1))
 plot(xs, fx, type = "l", col = "steelblue", lwd = 2,
      xlab = "x", ylab = "y",
      main = expression(f(x) == x^2 + sin(x) ~ "and its derivative"),
@@ -86,6 +86,7 @@ abline(v = x_mark, col = "grey60", lty = 3)
 legend("topleft", legend = c("f(x)", "f'(x) via AD"),
        col = c("steelblue", "firebrick"), lty = c(1, 2), lwd = 2,
        bty = "n")
+par(oldpar)
 ```
 
 ## Works through any R code
@@ -196,7 +197,7 @@ errors <- abs(c(finite_diff - analytical, ad_result - analytical))
 # Use log10 scale; clamp AD error to .Machine$double.eps if exactly zero
 errors[errors == 0] <- .Machine$double.eps
 
-par(mar = c(4, 5, 2, 1))
+oldpar <- par(mar = c(4, 5, 2, 1))
 bp <- barplot(log10(errors),
               names.arg = c("Finite Diff", "AD (nabla)"),
               col = c("coral", "steelblue"),
@@ -206,6 +207,7 @@ bp <- barplot(log10(errors),
 abline(h = log10(.Machine$double.eps), lty = 2, col = "grey40")
 text(mean(bp), log10(.Machine$double.eps) + 0.8,
      "machine epsilon", cex = 0.8, col = "grey40")
+par(oldpar)
 ```
 
 This advantage becomes critical for optimization algorithms that depend on

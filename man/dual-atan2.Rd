@@ -28,6 +28,6 @@ Two-argument arctangent for dual numbers
 y <- dual_variable(1)
 x <- dual_constant(1)
 result <- atan2(y, x)
-value(result)  # pi/4
+value(result)
 
 }

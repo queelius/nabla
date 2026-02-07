@@ -20,7 +20,7 @@ Logarithm with optional base for dual numbers
 }
 \examples{
 x <- dual_variable(8)
-value(log(x, base = 2))  # 3
-deriv(log(x, base = 2))  # 1 / (8 * log(2))
+value(log(x, base = 2))
+deriv(log(x, base = 2))
 
 }

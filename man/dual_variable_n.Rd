@@ -21,8 +21,7 @@ after evaluating a function \code{f}, the k-th derivative can be
 extracted with \code{deriv_n(result, k)}.
 }
 \examples{
-# 3rd derivative of x^4 at x=2: 4*3*2*x = 24*2 = 48
 x <- dual_variable_n(2, order = 3)
 r <- x^4
-deriv_n(r, 3)  # 48
+deriv_n(r, 3)
 }

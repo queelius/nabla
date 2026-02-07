@@ -265,7 +265,7 @@ The sampling distributions of the MLEs show the asymmetric shape predicted
 by the skewness analysis:
 
 ```{r fig-mle-histograms, fig.width=7, fig.height=3.5}
-par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
+oldpar <- par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
 
 # alpha_hat
 hist(alpha_hats, breaks = 50, freq = FALSE, col = "grey85", border = "grey60",
@@ -290,6 +290,7 @@ legend("topright",
        legend = c("Normal approx", expression(beta[true])),
        col = c("steelblue", "firebrick"), lty = c(1, 2), lwd = 2,
        bty = "n", cex = 0.8)
+par(oldpar)
 ```
 
 The right tail is visibly heavier than the left, consistent with the

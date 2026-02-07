@@ -20,6 +20,6 @@ Extracts the primal value, discarding the derivative.
 }
 \examples{
 x <- dual(3.14, 1)
-as.numeric(x)  # 3.14
+as.numeric(x)
 
 }

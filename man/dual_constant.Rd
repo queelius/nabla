@@ -18,5 +18,5 @@ constant with respect to the differentiation variable.
 }
 \examples{
 k <- dual_constant(5)
-deriv(k)  # 0
+deriv(k)
 }

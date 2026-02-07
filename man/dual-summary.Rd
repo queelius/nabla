@@ -26,7 +26,7 @@ correctly through \code{sum} (additive) and \code{prod} (multiplicative).
 \examples{
 x <- dual_variable(2)
 y <- dual_variable(5)
-value(sum(x, y))   # 7
-value(prod(x, y))  # 10
+value(sum(x, y))
+value(prod(x, y))
 
 }

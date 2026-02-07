@@ -44,14 +44,13 @@ wrappers: \code{gradient(f, x)} is \code{D(f, x)}, \code{hessian(f, x)} is
 }
 \examples{
 f <- function(x) x[1]^2 * x[2]
-D(f, c(3, 4))                     # gradient: c(24, 9)
-D(f, c(3, 4), order = 2)          # Hessian matrix
+D(f, c(3, 4))
+D(f, c(3, 4), order = 2)
 
 g <- function(x) list(x[1] * x[2], x[1]^2)
-D(g, c(2, 3))                     # 2x2 Jacobian
+D(g, c(2, 3))
 
-# Composition: D(D(f)) == D(f, order = 2)
 Df <- D(f)
 DDf <- D(Df)
-DDf(c(3, 4))                      # same as D(f, c(3,4), order=2)
+DDf(c(3, 4))
 }

@@ -149,15 +149,15 @@ test_that("optimizer plot: contour + path data is finite", {
   nll <- function(theta) -ll(theta)
   ngr <- function(theta) -gradient(ll, theta)
 
-  # BFGS path collection
-  trace <- list()
+  # BFGS path collection (use environment to avoid <<-)
+  env <- new.env(parent = emptyenv())
+  env$trace <- list()
   fn_trace <- function(theta) {
-    trace[[length(trace) + 1L]] <<- theta
+    env$trace[[length(env$trace) + 1L]] <- theta
     nll(theta)
   }
-  trace <- list()
   optim(c(0, 1), fn = fn_trace, gr = ngr, method = "BFGS")
-  path <- do.call(rbind, trace)
+  path <- do.call(rbind, env$trace)
 
   expect_true(all(is.finite(path)))
   expect_true(nrow(path) >= 2)

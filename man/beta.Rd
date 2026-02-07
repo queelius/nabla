@@ -24,7 +24,7 @@ beta(a, b)
 Computed as \code{exp(lbeta(a, b))}.
 }
 \examples{
-beta(2, 3)  # 1/12
+beta(2, 3)
 a <- dual_variable(2)
 value(beta(a, 3))
 }

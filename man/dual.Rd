@@ -20,6 +20,6 @@ Create a dual number
 }
 \examples{
 x <- dual(3, 1)
-value(x)  # 3
-deriv(x)  # 1
+value(x)
+deriv(x)
 }

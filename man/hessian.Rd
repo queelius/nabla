@@ -20,5 +20,5 @@ using forward-mode AD. Equivalent to \code{D(f, x, order = 2)}.
 }
 \examples{
 f <- function(x) -(x[1] - 3)^2 - (x[2] - 5)^2
-hessian(f, c(1, 2))  # diag(c(-2, -2))
+hessian(f, c(1, 2))
 }

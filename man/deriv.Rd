@@ -22,5 +22,5 @@ The deriv slot.
 Extract the derivative (tangent) part of a dual number
 }
 \examples{
-deriv(dual(3, 1))  # 1
+deriv(dual(3, 1))
 }

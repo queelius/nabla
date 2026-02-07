@@ -19,5 +19,5 @@ contains \eqn{df/dx}.
 }
 \examples{
 x <- dual_variable(2)
-deriv(x^2)  # 4 = 2*x evaluated at x=2
+deriv(x^2)
 }

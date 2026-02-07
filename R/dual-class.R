@@ -26,8 +26,8 @@ setClass("dualr", slots = list(value = "ANY", deriv = "ANY"))
 #' @export
 #' @examples
 #' x <- dual(3, 1)
-#' value(x)  # 3
-#' deriv(x)  # 1
+#' value(x)
+#' deriv(x)
 dual <- function(value, deriv = 0) {
   new("dualr", value = value, deriv = deriv)
 }
@@ -43,7 +43,7 @@ dual <- function(value, deriv = 0) {
 #' @export
 #' @examples
 #' x <- dual_variable(2)
-#' deriv(x^2)  # 4 = 2*x evaluated at x=2
+#' deriv(x^2)
 dual_variable <- function(x) {
   .dual(x, 1)
 }
@@ -58,7 +58,7 @@ dual_variable <- function(x) {
 #' @export
 #' @examples
 #' k <- dual_constant(5)
-#' deriv(k)  # 0
+#' deriv(k)
 dual_constant <- function(x) {
   .dual(x, 0)
 }
@@ -71,7 +71,7 @@ dual_constant <- function(x) {
 #' @return The value slot.
 #' @export
 #' @examples
-#' value(dual(3, 1))  # 3
+#' value(dual(3, 1))
 setGeneric("value", function(d) standardGeneric("value"))
 
 #' @rdname value
@@ -88,7 +88,7 @@ setMethod("value", "numeric", function(d) d)
 #' @return The deriv slot.
 #' @export
 #' @examples
-#' deriv(dual(3, 1))  # 1
+#' deriv(dual(3, 1))
 setGeneric("deriv", function(d) standardGeneric("deriv"))
 
 #' @rdname deriv
@@ -107,10 +107,10 @@ setMethod("deriv", "numeric", function(d) 0)
 #' @return Invisible \code{NULL}; called for side effect of printing.
 #' @examples
 #' x <- dual(3, 1)
-#' x  # prints: <dual: 3 + 1*e>
+#' x
 #'
 #' dv <- dual_vector(dual(1, 0), dual(2, 1))
-#' dv  # prints: <dual_vector: 2 elements>
+#' dv
 #'
 #' @name dual-show
 #' @aliases show,dualr-method show,dual_vector-method
@@ -135,7 +135,7 @@ setMethod("show", "dualr", function(object) {
 #' @return Numeric value.
 #' @examples
 #' x <- dual(3.14, 1)
-#' as.numeric(x)  # 3.14
+#' as.numeric(x)
 #'
 #' @name dual-coerce
 #' @aliases as.numeric,dualr-method
@@ -154,8 +154,8 @@ setMethod("as.numeric", "dualr", function(x, ...) {
 #' @param x An object.
 #' @return Logical.
 #' @examples
-#' is_dual(dual(1, 0))  # TRUE
-#' is_dual(42)           # FALSE
+#' is_dual(dual(1, 0))
+#' is_dual(42)
 #' @export
 is_dual <- function(x) {
   is(x, "dualr")
@@ -170,7 +170,7 @@ is_dual <- function(x) {
 #' @param x A \code{dual} object.
 #' @return \code{TRUE}.
 #' @examples
-#' is.numeric(dual(1, 0))  # TRUE
+#' is.numeric(dual(1, 0))
 #'
 #' @name dual-is-numeric
 #' @aliases is.numeric,dualr-method
@@ -192,7 +192,7 @@ setMethod("is.numeric", "dualr", function(x) TRUE)
 #' x <- dual_variable(1)
 #' y <- dual_variable(2)
 #' dv <- c(x, y)
-#' length(dv)  # 2
+#' length(dv)
 #'
 #' @name dual-combine
 #' @aliases c,dualr-method
@@ -236,8 +236,8 @@ setClass("dual_vector", contains = "list")
 #' @export
 #' @examples
 #' dv <- dual_vector(dual(1, 0), dual(2, 1))
-#' length(dv)  # 2
-#' value(dv[1])  # 1
+#' length(dv)
+#' value(dv[1])
 dual_vector <- function(...) {
   args <- list(...)
   if (length(args) == 1L && is.list(args[[1L]]) && !is(args[[1L]], "dualr")) {
@@ -255,8 +255,8 @@ dual_vector <- function(...) {
 #'   vector index; an integer for \code{length}.
 #' @examples
 #' dv <- dual_vector(dual(10, 1), dual(20, 0), dual(30, 0))
-#' value(dv[1])   # 10
-#' length(dv)     # 3
+#' value(dv[1])
+#' length(dv)
 #'
 #' @name dual_vector-access
 #' @aliases [,dual_vector,numeric-method length,dual_vector-method

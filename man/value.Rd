@@ -22,5 +22,5 @@ The value slot.
 Extract the value (primal) part of a dual number
 }
 \examples{
-value(dual(3, 1))  # 3
+value(dual(3, 1))
 }

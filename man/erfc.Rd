@@ -22,7 +22,7 @@ The complementary error function value.
 Computes \eqn{\mathrm{erfc}(x) = 1 - \mathrm{erf}(x)}.
 }
 \examples{
-erfc(1)  # 1 - erf(1)
+erfc(1)
 x <- dual_variable(0)
-value(erfc(x))  # 1
+value(erfc(x))
 }

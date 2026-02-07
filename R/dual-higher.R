@@ -22,10 +22,9 @@
 #' @return A (possibly nested) dual number.
 #' @export
 #' @examples
-#' # 3rd derivative of x^4 at x=2: 4*3*2*x = 24*2 = 48
 #' x <- dual_variable_n(2, order = 3)
 #' r <- x^4
-#' deriv_n(r, 3)  # 48
+#' deriv_n(r, 3)
 dual_variable_n <- function(x, order) {
   order <- as.integer(order)
   if (order < 0L) stop("order must be a non-negative integer")
@@ -47,9 +46,9 @@ dual_variable_n <- function(x, order) {
 #' @export
 #' @examples
 #' k <- dual_constant_n(5, order = 3)
-#' deriv_n(k, 1)  # 0
-#' deriv_n(k, 2)  # 0
-#' deriv_n(k, 3)  # 0
+#' deriv_n(k, 1)
+#' deriv_n(k, 2)
+#' deriv_n(k, 3)
 dual_constant_n <- function(x, order) {
   order <- as.integer(order)
   if (order < 0L) stop("order must be a non-negative integer")
@@ -77,10 +76,10 @@ dual_constant_n <- function(x, order) {
 #' @examples
 #' x <- dual_variable_n(1, order = 3)
 #' r <- exp(x)
-#' deriv_n(r, 0)  # exp(1) = 2.718...
-#' deriv_n(r, 1)  # exp(1)
-#' deriv_n(r, 2)  # exp(1)
-#' deriv_n(r, 3)  # exp(1)
+#' deriv_n(r, 0)
+#' deriv_n(r, 1)
+#' deriv_n(r, 2)
+#' deriv_n(r, 3)
 deriv_n <- function(d, k) {
   k <- as.integer(k)
   if (k < 0L) stop("k must be a non-negative integer")
@@ -108,13 +107,7 @@ deriv_n <- function(d, k) {
 #'   \code{d2}, ..., \code{d<order>}.
 #' @export
 #' @examples
-#' # All derivatives of sin(x) at x = pi/4
 #' differentiate_n(sin, pi/4, order = 4)
-#' # $value = sin(pi/4)
-#' # $d1 = cos(pi/4)
-#' # $d2 = -sin(pi/4)
-#' # $d3 = -cos(pi/4)
-#' # $d4 = sin(pi/4)
 differentiate_n <- function(f, x, order) {
   order <- as.integer(order)
   if (order < 1L) stop("order must be a positive integer")
