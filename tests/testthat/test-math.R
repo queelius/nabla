@@ -322,7 +322,7 @@ test_that("Inf propagates through exp of large dual", {
 
 test_that("log of negative dual produces NaN", {
   x <- dual(-1, 1)
-  r <- log(x)
+  expect_warning(r <- log(x), "NaN")
   expect_true(is.nan(value(r)))
 })
 

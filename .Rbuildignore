@@ -16,3 +16,7 @@
 ^dualr\.Rcheck$
 ^nabla_.*\.tar\.gz$
 ^CRAN-SUBMISSION$
+^CODE_OF_CONDUCT\.md$
+^CONTRIBUTING\.md$
+^paper\.md$
+^paper\.bib$
