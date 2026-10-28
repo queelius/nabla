@@ -21,3 +21,10 @@ operations and numerical/computational limitations explicitly.
 All 770 test assertions passed with no failures, warnings, or skips.
 Vignette rebuilding, examples, and the PDF manual passed. Current test coverage
 is 92.63%. Cross-platform checks have not been rerun for this update.
+
+## Current R-devel check
+
+GitHub Actions, Ubuntu, R Under development (2026-10-26 r90766):
+`R CMD check --no-manual --as-cran` completed with Status: OK.
+
+https://github.com/queelius/nabla/actions/runs/40639814651/job/122655076761
