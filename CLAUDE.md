@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-`nabla` is an R package for exact automatic differentiation. It provides exact derivatives at machine precision through any R code (loops, branches, control flow) via operator overloading on S4 dual number classes.
+`nabla` is an R package for automatic differentiation via operator overloading on S4 dual number classes. Functions must use supported scalar operations; loops and executed branches can compose those operations. Arbitrary compiled functions and matrix operations are not supported. Derivatives avoid finite difference truncation error but remain subject to floating-point rounding and conditioning.
 
 ## Build & Test Commands
 

@@ -1,6 +1,6 @@
 {
   "title": "nabla: Exact Derivatives via Automatic Differentiation",
-  "description": "Exact automatic differentiation for R functions. Provides a composable derivative operator D that computes gradients, Hessians, Jacobians, and arbitrary-order derivative tensors at machine precision. D(D(f)) gives Hessians, D(D(D(f))) gives third-order tensors for skewness of MLEs, and so on to any order. Works through any R code including loops, branches, and control flow.",
+  "description": "Automatic differentiation for R functions composed of supported scalar arithmetic and mathematical operations. A composable derivative operator computes gradients, Hessians, Jacobians, and higher-order derivative tensors using nested dual numbers. Supports loops and executed branches using supported operations, without finite difference truncation error. Floating-point rounding and conditioning still affect results; computational cost grows rapidly with dimension and derivative order.",
   "creators": [
     {
       "name": "Towell, Alexander",
@@ -39,5 +39,5 @@
       "scheme": "url"
     }
   ],
-  "version": "0.7.1"
+  "version": "0.7.2"
 }

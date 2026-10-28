@@ -109,9 +109,17 @@ setMethod("Math", "dualr", function(x) {
     "digamma" = .dual(digamma(v), d * trigamma(v)),
     "trigamma" = .dual(trigamma(v), d * psigamma(v, deriv = 2L)),
 
-    # -- Cumulative / factorial (not differentiable in usual sense) --
-    "cummax"  = .dual(cummax(v), 0),
-    "cummin"  = .dual(cummin(v), 0),
+    # Cumulative extrema of a scalar are the identity, including nested
+    # derivatives. Vector-valued duals need a separate selection rule.
+    "cummax" =,
+    "cummin" = {
+      primal <- v
+      while (is(primal, "dualr")) primal <- primal@value
+      if (length(primal) != 1L) {
+        stop("Cumulative extrema support scalar dual numbers only")
+      }
+      x
+    },
     "cumsum"  = .dual(cumsum(v), cumsum(d)),
     "cumprod" = {
       stop("cumprod() is not supported for dual numbers (derivative cannot be propagated). Use Reduce(\"*\", ...) instead.")

@@ -1,16 +1,18 @@
 
 # nabla <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
-> Arbitrary-order exact derivatives at machine precision
+> Gradients, Hessians, and higher derivatives for small statistical models
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/nabla)](https://CRAN.R-project.org/package=nabla)
 [![R-CMD-check](https://github.com/queelius/nabla/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/queelius/nabla/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-`nabla` provides a single composable operator `D` that differentiates any
-R function to any order — exactly, at machine precision, through loops,
-branches, and all control flow:
+`nabla` provides a composable operator `D` for differentiating R functions
+written with supported scalar arithmetic and mathematical operations.
+Use it to supply gradients to an optimizer, compute curvature for standard
+errors, or investigate higher-order sensitivity without choosing a finite
+difference step size. Loops and branches can use these operations:
 
 ```r
 library(nabla)
@@ -24,20 +26,21 @@ D(f, c(1, 0), order = 4)     # 2×2×2×2 fourth-order tensor
 
 Each application of `D` adds one dimension to the output. `D(D(f))` gives
 the Hessian, `D(D(D(f)))` gives the third-order tensor, and so on —
-no limit on order, no loss of precision, no symbolic algebra.
+without symbolic differentiation or finite difference truncation error.
+Results remain subject to floating-point rounding and conditioning.
 
 ## Why nabla?
 
 | | **Finite Differences** | **Symbolic Diff** | **AD (nabla)** |
 |---|---|---|---|
-| **Accuracy** | O(h) or O(h²) truncation error | Exact | **Exact (machine precision)** |
+| **Accuracy** | Step-size dependent truncation error | Exact symbolic expressions | **No finite difference truncation error** |
 | **Higher-order** | Error compounds rapidly | Expression swell | **Composes cleanly to any order** |
-| **Control flow** | Works | Breaks on if/for/while | **Works through any code** |
+| **Control flow** | Evaluates the function | Depends on the symbolic system | **Differentiates the executed branch using supported operations** |
 
 Finite differences lose precision at higher orders (each order multiplies
 the error). Symbolic differentiation suffers from expression swell.
-`nabla` composes `D` via nested dual numbers — each order is as precise
-as the first.
+`nabla` composes `D` via nested dual numbers. This makes it useful for small
+models where higher derivatives matter; it is not a high-dimensional AD engine.
 
 ## Installation
 
@@ -51,7 +54,7 @@ remotes::install_github("queelius/nabla")
 
 ## The `D` operator
 
-`D` is the core of `nabla`. It differentiates any function `f` and
+`D` is the core of `nabla`. It differentiates a compatible function `f` and
 returns a new function — which can itself be differentiated:
 
 ```r
@@ -90,8 +93,25 @@ $$f(x + \varepsilon) = f(x) + f'(x)\,\varepsilon$$
 For higher orders, `nabla` nests dual numbers: a dual whose components are
 themselves duals. Each level of nesting extracts one additional order of
 derivative — so `D(D(D(f)))` propagates through triply-nested duals to
-produce exact third derivatives. This works through `lgamma`, `psigamma`,
-trig functions, and all of R's math — no special cases needed.
+produce third derivatives. Supported operations include `lgamma`,
+`psigamma`, and trigonometric functions, each with a derivative rule.
+
+## Compatibility and limits
+
+- Access parameters by numeric index, such as `x[1]`. The input passed to
+  your function is a container of scalar dual numbers, not a numeric vector.
+  Write `x[1]^2 + x[2]^2` rather than `sum(x^2)`.
+- Supported scalar arithmetic and math can be composed in loops and branches.
+  Matrix algebra, arbitrary compiled routines, and base distribution functions
+  such as `pnorm()` are not automatically differentiable. Rewrite the expression
+  using supported operations or use a different derivative engine.
+- Converting an intermediate dual with `as.numeric()` discards derivatives.
+  A branch derivative describes the executed branch; it does not establish
+  differentiability at a boundary or a tie in `min()` or `max()`.
+- For `p` parameters, an order-`k` derivative requires `p^k` evaluations of
+  the original function and stores a tensor with `p^k` entries for scalar
+  output. Nested dual arithmetic adds further cost. Start with low dimension
+  and low order, and check derivatives against a known model.
 
 ## Use cases
 

@@ -12,10 +12,12 @@ authors:
 repository-code: "https://github.com/queelius/nabla"
 url: "https://metafunctor.com"
 abstract: >-
-  Exact automatic differentiation for R functions. Provides a composable
+  Automatic differentiation for R functions using supported scalar operations.
+  Provides a composable
   derivative operator D that computes gradients, Hessians, Jacobians, and
-  arbitrary-order derivative tensors at machine precision. Works through
-  any R code including loops, branches, and control flow.
+  higher-order derivative tensors using nested dual numbers. Supports loops
+  and executed branches composed of supported operations. Floating-point
+  rounding and conditioning still affect results.
 keywords:
   - automatic-differentiation
   - dual-numbers
@@ -26,5 +28,4 @@ keywords:
   - higher-order-derivatives
   - R
 license: MIT
-version: 0.7.0
-date-released: "2026-02-02"
+version: 0.7.2

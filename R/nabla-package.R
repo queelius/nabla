@@ -4,7 +4,9 @@
 #' Implements forward-mode automatic differentiation using dual numbers
 #' with S4 classes. Supports exact arbitrary-order derivatives through
 #' recursive nesting of duals, with high-level functions for computing
-#' gradients, Hessian matrices, and Jacobians of arbitrary functions.
+#' gradients, Hessian matrices, and Jacobians of functions composed of
+#' supported scalar operations. Loops and executed branches are supported;
+#' arbitrary compiled functions and matrix operations are not.
 #'
 #' @section Core Types:
 #' \describe{

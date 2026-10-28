@@ -1,18 +1,21 @@
 Package: nabla
 Title: Exact Derivatives via Automatic Differentiation
-Version: 0.7.1
+Version: 0.7.2
 Authors@R: person("Alexander", "Towell",
                    role = c("aut", "cre"),
                    email = "queelius@gmail.com",
                    comment = c(ORCID = "0000-0001-6443-9897"))
 URL: https://github.com/queelius/nabla, https://metafunctor.com
 BugReports: https://github.com/queelius/nabla/issues
-Description: Exact automatic differentiation for R functions. Provides a
+Description: Automatic differentiation for R functions written with
+    supported scalar arithmetic and mathematical operations. Provides a
     composable derivative operator D that computes gradients, Hessians,
     Jacobians, and arbitrary-order derivative tensors at machine precision.
     D(D(f)) gives Hessians, D(D(D(f))) gives third-order tensors for
-    skewness of maximum likelihood estimators, and so on to any order. Works through any R code
-    including loops, branches, and control flow.
+    skewness of maximum likelihood estimators, and so on to higher orders.
+    Supports loops and executed branches composed of supported operations.
+    Uses nested dual numbers without finite difference truncation error;
+    floating-point rounding and conditioning still affect results.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

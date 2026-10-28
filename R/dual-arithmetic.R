@@ -29,8 +29,8 @@ NULL
 
 .is_zero <- function(x) {
   if (identical(x, 0)) return(TRUE)
-  if (is.numeric(x)) return(length(x) == 1L && x == 0)
   if (is(x, "dualr")) return(.is_zero(x@value) && .is_zero(x@deriv))
+  if (is.numeric(x)) return(isTRUE(length(x) == 1L && x == 0))
   FALSE
 }
 
@@ -133,7 +133,9 @@ setMethod("^", signature(e1 = "dualr", e2 = "dualr"), function(e1, e2) {
   is_d1_zero <- .is_zero(d1)
   is_d2_zero <- .is_zero(d2)
   if (is_d2_zero) {
-    drv <- v2 * v1^(v2 - 1) * d1
+    # A constant zero exponent is constant even at a zero base. Avoid
+    # evaluating 0 * 0^(-1), including at inner levels of nested duals.
+    drv <- if (.is_zero(v2)) 0 else v2 * v1^(v2 - 1) * d1
   } else if (is_d1_zero) {
     drv <- val * log(v1) * d2
   } else {
@@ -146,14 +148,16 @@ setMethod("^", signature(e1 = "dualr", e2 = "dualr"), function(e1, e2) {
 #' @export
 setMethod("^", signature(e1 = "dualr", e2 = "numeric"), function(e1, e2) {
   v1 <- e1@value
-  .dual(v1^e2, e2 * v1^(e2 - 1) * e1@deriv)
+  drv <- if (.is_zero(e2)) 0 else e2 * v1^(e2 - 1) * e1@deriv
+  .dual(v1^e2, drv)
 })
 
 #' @rdname dual-arithmetic
 #' @export
 setMethod("^", signature(e1 = "numeric", e2 = "dualr"), function(e1, e2) {
   val <- e1^e2@value
-  .dual(val, val * log(e1) * e2@deriv)
+  drv <- if (.is_zero(e2@deriv)) 0 else val * log(e1) * e2@deriv
+  .dual(val, drv)
 })
 
 # =============================================================================

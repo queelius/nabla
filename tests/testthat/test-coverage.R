@@ -276,7 +276,7 @@ test_that("cummax() on scalar dual", {
   r <- cummax(dual(3, 1))
   expect_true(is_dual(r))
   expect_equal(value(r), 3)
-  expect_equal(deriv(r), 0)
+  expect_equal(deriv(r), 1)
 })
 
 # -- cummin() ------------------------------------------------------------------
@@ -285,7 +285,7 @@ test_that("cummin() on scalar dual", {
   r <- cummin(dual(3, 1))
   expect_true(is_dual(r))
   expect_equal(value(r), 3)
-  expect_equal(deriv(r), 0)
+  expect_equal(deriv(r), 1)
 })
 
 # -- factorial() ---------------------------------------------------------------

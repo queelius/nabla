@@ -1,3 +1,14 @@
+# nabla 0.7.2
+
+* Fixed zero powers at zero and higher derivatives of polynomials at the
+  origin, which previously produced `NaN` after the polynomial degree.
+* Preserved higher-order exponent derivatives when their first derivative
+  vanishes, by checking all nested dual components before simplifying.
+* Fixed `cummax()` and `cummin()` on scalar dual numbers to propagate the
+  identity derivative. Unsupported vector-valued dual inputs now error.
+* Clarified supported operations, floating-point limitations, and the
+  dimension/order cost of derivative tensors in the README and metadata.
+
 # nabla 0.7.0
 
 * Added vignette "Higher-Order MLE Analysis" demonstrating third-order
